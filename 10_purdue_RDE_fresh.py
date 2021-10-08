@@ -138,6 +138,11 @@ class CL_graph_create(CL_graph_setting):
         else:
             self.ax.plot(list_x, list_y, c=color)
 
+    def func_scatter_add(self,array_x,array_y):
+        array_x = array_x.flatten()
+        array_y = array_y.flatten()
+        self.ax.scatter(array_x,array_y)
+
     def func_show(self):
         plt.show()
 
@@ -214,19 +219,19 @@ graph0.func_rde_exit(rde_l)
 #------------------------------------------------------------------
 ## deto波と燃焼室底面の接点はどの条件であろうと不変である -> 原点 （本番でもこのつもり）
 ## この計算では「deto_height」固定
-dw_angle = 100. / 360. * 2. * np.pi # [rad]: detonation angle from horizontal axis (theta axis)
-dw_height = 1.0 # [-]: injection fill height normalized by deto_height (z axis)
+angle_dw = 105. / 360. * 2. * np.pi # [rad]: detonation angle from horizontal axis (theta axis)
+height_dw = 1.0 # [-]: injection fill height normalized by deto_height (z axis)
 ## deto波描画
 ## そういえばatanの値域って -np.pi/2. ~ +np.pi/2. だったっけか 
-array_point_dw = (dw_height*math.atan(-(dw_angle-np.pi/2.)), dw_height)
+array_point_dw = (height_dw*math.atan(-(angle_dw-np.pi/2.)), height_dw)
 graph0.func_graph_add((0., array_point_dw[0]), (0., array_point_dw[1]), color="r")
 
 #------------------------------------------------------------------
 #### 0. assumptions for fresh mixture layer
 #------------------------------------------------------------------
 ## 「detonation wave」と「fresh mixture layer」のどちらを先に描画するべきなのか分からないからとりあえず
-fm_angle = 20. / 360. * 2. * np.pi # deto_angle - np.pi/2.
-slope_fm = math.atan(fm_angle)
+angle_fm = 15. / 360. * 2. * np.pi # deto_angle - np.pi/2.
+slope_fm = math.atan(angle_fm)
 intercept_fm = func_intercept(slope_fm, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_fm), (0., intercept_fm))
 graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="b")
@@ -234,8 +239,8 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 #------------------------------------------------------------------
 #### 0. assumptions for slip line
 #------------------------------------------------------------------
-sl_angle = 30. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
-slope_sl = math.atan(sl_angle)
+angle_sl = 30. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
+slope_sl = math.atan(angle_sl)
 intercept_sl = func_intercept(slope_sl, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_sl), (rde_l, intercept_sl))
 graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="b")
@@ -243,8 +248,8 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 #------------------------------------------------------------------
 #### 0. assumptions for oblique-shock
 #------------------------------------------------------------------
-os_angle = 60. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
-slope_os = math.atan(os_angle)
+angle_os = 60. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
+slope_os = math.atan(angle_os)
 intercept_os = func_intercept(slope_os, array_point_dw)
 x_cross, y_cross = func_cross((0, slope_os), (rde_l, intercept_os))
 graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="r")
@@ -256,7 +261,7 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 ## この計算では「deto_height」固定
 ## deto波描画
 ## そういえばatanの値域って -np.pi/2. ~ +np.pi/2. だったっけか 
-array_point_dw_2nd = (2.*np.pi-1.*math.tan(fm_angle), dw_height)
+array_point_dw_2nd = (2.*np.pi-1.*math.tan(angle_fm), height_dw)
 graph0.func_graph_add((2.*np.pi, array_point_dw_2nd[0]), (0., array_point_dw_2nd[1]), color="r")
 
 #------------------------------------------------------------------
@@ -282,137 +287,186 @@ graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+angle_bottom = 0. * 2. * np.pi /360.
+
 #------------------------------------------------------------------
 #### 1. characteristic lines -1st
 #------------------------------------------------------------------
-num_ch = 5 # number of characteristic lines
 
+num_ch = 7 # number of characteristic lines
 
-
-
-## デトネーション波の角度とすべり面の角度が入ってしまうので追加して削除
-# もっと賢い方法教えてください
-
-
-
-
-array_theta = np.zeros((num_ch, num_ch))
-array_neu = np.zeros((num_ch, num_ch))
-array_beta = np.zeros((num_ch, num_ch))
-array_Mach = np.zeros((num_ch, num_ch))
-
-
-## for C-
-array_theta[0] = np.linspace((dw_angle-np.pi/2.),sl_angle,num_ch)
-array_neu[0] = array_theta[0]-(dw_angle-np.pi/2.)
-
-
-## for C+
-array_theta = np.transpose(array_theta)
-array_theta[0] = np.linspace((dw_angle-np.pi/2.),0.,num_ch)
-array_theta = np.transpose(array_theta)
-# print(array_theta*360./2./np.pi)
-array_neu = np.transpose(array_neu)
-array_neu[0] = np.linspace(0.,(dw_angle-np.pi/2.),num_ch)
-array_neu = np.transpose(array_neu)
-# print(array_neu*360./2./np.pi)
 ### i方向（横）にtheta-neu=const.確認
 ### j方向（縦）にtheta+neu=const.確認
 
-for i0 in range(int(num_ch)):
-    array_Mach[0][i0] = func_neu2Mach(array_neu[0][i0])
-    array_Mach[i0][0] = func_neu2Mach(array_neu[i0][0])
-    array_beta[0][i0] = math.asin(1./array_Mach[0][i0])
-    array_beta[i0][0] = math.asin(1./array_Mach[i0][0])
+array_zero = np.zeros((int(num_ch-1),int(num_ch)))
 
-for j1 in range(1, int(num_ch)):
-    for i1 in range(1, int(num_ch)):
-        array_theta[j1][i1] = (array_neu[j1-1][i1]-array_neu[j1][i1-1])/2. \
-            +(array_theta[j1-1][i1]+array_theta[j1][i1-1])/2.
-        array_neu[j1][i1] = (array_neu[j1-1][i1]+array_neu[j1][i1-1])/2. \
-            +(array_theta[j1-1][i1]-array_theta[j1][i1-1])/2.
+### theta
+array_theta_up = np.linspace(angle_fm,angle_sl,num_ch)
+array_theta = np.flipud(np.diag(array_theta_up))
+array_theta = np.delete(array_theta,-1,0)
+array_theta_down = np.linspace(angle_fm,angle_bottom,num_ch)
+array_theta_down = np.transpose(np.vstack((array_theta_down,array_zero)))
+array_theta = np.vstack((array_theta,array_theta_down))
+del array_theta_up
+del array_theta_down
+
+### neu, Mach, beta
+array_neu_up = np.linspace(angle_fm,angle_sl,num_ch)
+array_neu_up = array_neu_up - angle_fm
+array_Mach_up = np.zeros((int(num_ch)))
+array_beta_up = np.zeros((int(num_ch)))
+for i0 in range(int(num_ch)):
+    array_Mach_up[i0] = func_neu2Mach(array_neu_up[i0])
+    array_beta_up[i0] = math.asin(1./array_Mach_up[i0])
+array_neu = np.flipud(np.diag(array_neu_up))
+array_Mach = np.flipud(np.diag(array_Mach_up))
+array_beta = np.flipud(np.diag(array_beta_up))
+#====
+array_neu = np.delete(array_neu,-1,0)
+array_Mach = np.delete(array_Mach,-1,0)
+array_beta = np.delete(array_beta,-1,0)
+#====
+array_neu_down = np.linspace(angle_fm,angle_bottom,num_ch)
+array_neu_down = angle_fm - array_neu_down
+array_Mach_down = np.zeros((int(num_ch)))
+array_beta_down = np.zeros((int(num_ch)))
+for i0 in range(int(num_ch)):
+    array_Mach_down[i0] = func_neu2Mach(array_neu_down[i0])
+    array_beta_down[i0] = math.asin(1./array_Mach_down[i0])
+array_neu_down = np.transpose(np.vstack((array_neu_down,array_zero)))
+array_Mach_down = np.transpose(np.vstack((array_Mach_down,array_zero)))
+array_beta_down = np.transpose(np.vstack((array_beta_down,array_zero)))
+array_neu = np.vstack((array_neu,array_neu_down))
+array_Mach = np.vstack((array_Mach,array_Mach_down))
+array_beta = np.vstack((array_beta,array_beta_down))
+del array_neu_up
+del array_neu_down
+del array_Mach_up
+del array_Mach_down
+del array_beta_up
+del array_beta_down
+
+### alpha_plus, alpha_minus
+array_alpha_plus_up = np.zeros((int(num_ch)))
+array_alpha_plus = np.flipud(np.diag(array_alpha_plus_up))
+array_alpha_plus = np.delete(array_alpha_plus,-1,0)
+array_alpha_plus_down = np.zeros((int(num_ch)))
+for i0 in range(1, int(num_ch)):
+    array_alpha_plus_down[i0] = (array_theta[int(num_ch-2)+i0][0]+array_beta[int(num_ch-2)+i0][0])/2. + \
+        (array_theta[int(num_ch-2)+i0+1][0]+array_beta[int(num_ch-2)+i0+1][0])/2.
+array_alpha_plus_down = np.transpose(np.vstack((array_alpha_plus_down,array_zero)))
+array_alpha_plus = np.vstack((array_alpha_plus,array_alpha_plus_down))
+del array_alpha_plus_up
+del array_alpha_plus_down
+
+array_alpha_minus_up = np.zeros((int(num_ch)))
+for i0 in range(1,int(num_ch)):
+    array_alpha_minus_up[i0] = (array_theta[int(num_ch)-i0][i0-1]-array_beta[int(num_ch)-i0][i0-1])/2. + \
+        (array_theta[int(num_ch)-i0-1][i0]-array_beta[int(num_ch)-i0-1][i0])/2.
+array_alpha_minus = np.flipud(np.diag(array_alpha_minus_up))
+array_alpha_minus = np.delete(array_alpha_minus,-1,0)
+array_alpha_minus_down = np.zeros((int(num_ch)))
+array_alpha_minus_down = np.transpose(np.vstack((array_alpha_minus_down,array_zero)))
+array_alpha_minus = np.vstack((array_alpha_minus,array_alpha_minus_down))
+del array_alpha_minus_up
+del array_alpha_minus_down
+
+
+### intercept_plus, intercept_minus
+array_itnercept_plus_up = np.zeros((int(num_ch)))
+array_itnercept_plus = np.flipud(np.diag(array_itnercept_plus_up))
+array_itnercept_plus = np.delete(array_itnercept_plus,-1,0)
+array_itnercept_plus_down = np.zeros((int(num_ch)))
+for i0 in range(1, int(num_ch)):
+    array_itnercept_plus_up[i0] = func_intercept(array_alpha_plus[int(num_ch-2)+i0+1][0], (0.,0.)) ### ただの原点
+array_itnercept_plus_down = np.transpose(np.vstack((array_itnercept_plus_down,array_zero)))
+array_itnercept_plus = np.vstack((array_itnercept_plus,array_itnercept_plus_down))
+del array_itnercept_plus_up
+del array_itnercept_plus_down
+
+array_itnercept_minus_up = np.zeros((int(num_ch)))
+for i0 in range(int(num_ch)):
+    array_itnercept_minus_up[i0] = func_intercept(array_alpha_minus[int(num_ch)-i0-1][i0], array_point_dw)
+array_itnercept_minus = np.flipud(np.diag(array_itnercept_minus_up))
+array_itnercept_minus = np.delete(array_itnercept_minus,-1,0)
+array_itnercept_minus_down = np.zeros((int(num_ch)))
+array_itnercept_minus_down = np.transpose(np.vstack((array_itnercept_minus_down,array_zero)))
+array_itnercept_minus = np.vstack((array_itnercept_minus,array_itnercept_minus_down))
+del array_itnercept_minus_up
+del array_itnercept_minus_down
+
+
+### x
+array_x_up = np.ones((int(num_ch))) * array_point_dw[0]
+array_x = np.flipud(np.diag(array_x_up))
+array_x = np.delete(array_x,-1,0)
+array_x_down = np.zeros((int(num_ch)))
+array_x_down = np.transpose(np.vstack((array_x_down,array_zero)))
+array_x = np.vstack((array_x,array_x_down))
+del array_x_up
+del array_x_down
+
+### y
+array_y_up = np.ones((int(num_ch))) * array_point_dw[1]
+array_y = np.flipud(np.diag(array_y_up))
+array_y = np.delete(array_y,-1,0)
+array_y_down = np.zeros((int(num_ch)))
+array_y_down = np.transpose(np.vstack((array_y_down,array_zero)))
+array_y = np.vstack((array_y,array_y_down))
+del array_y_up
+del array_y_down
+
+
+### 
+for i1 in range(1,int(num_ch)):
+
+    ### array_x, array_y の一要素目は先に与えなければならない
+    array_x[int(num_ch-i1)][i1], array_y[int(num_ch-i1)][i1] = func_cross((math.tan(array_alpha_plus[int(num_ch-i1)+1][i1-1]),math.tan(array_alpha_minus[int(num_ch-i1)-1][i1])), \
+        (array_itnercept_plus[int(num_ch-i1)+1][i1-1], array_itnercept_minus[int(num_ch-i1)-1][i1]))
+
+    for j1 in range(int(num_ch-i1), int(2.*num_ch-2)):
+        array_theta[j1][i1] = (array_neu[j1-1][i1]-array_neu[j1+1][i1-1])/2. + \
+             (array_theta[j1-1][i1]+array_theta[j1+1][i1-1])/2.
+        array_neu[j1][i1] = (array_neu[j1-1][i1]+array_neu[j1+1][i1-1])/2. + \
+             (array_theta[j1-1][i1]-array_theta[j1+1][i1-1])/2.
         array_Mach[j1][i1] = func_neu2Mach(array_neu[j1][i1])
         array_beta[j1][i1] = math.asin(1./array_Mach[j1][i1])
-
-# print("///array_theta///")
-# print(array_theta*360./2./np.pi)
-# print("///array_neu///")
-# print(array_neu*360./2./np.pi)
-# print("///array_Mach///")
-# print(array_Mach)
-# print("///array_beta///")
-# print(array_beta*360./2./np.pi)
-
-array_alpha_plus = np.zeros((num_ch, num_ch))
-array_alpha_minus = np.zeros((num_ch, num_ch))
-array_intercept_plus = np.zeros((num_ch, num_ch))
-array_intercept_minus = np.zeros((num_ch, num_ch))
-array_point = np.zeros((num_ch+1, num_ch+1, 2))
-
-### array_point 境界条件
-array_point[0][:] = [array_point_dw]*(num_ch+1)
-array_point[0][0] = None
-array_point[0][-1] = None
-
-for j1 in range(1,int(num_ch)):
-    for i1 in range(int(num_ch-1)):
-        array_alpha_plus[j1][i1] = ((array_theta[j1-1][i1]+array_beta[j1-1][i1]) \
-            + (array_theta[j1][i1]+array_beta[j1][i1]))/2.
-for j1 in range(int(num_ch-1)):
-    for i1 in range(1,int(num_ch)):
-        array_alpha_minus[j1][i1] = ((array_theta[j1][i1-1]-array_beta[j1][i1-1]) \
-            + (array_theta[j1][i1]-array_beta[j1][i1]))/2.
-
-for j1 in range(int(num_ch-1)):
-    array_point[j1+1][0] = np.zeros((1,2))
-    for i1 in range(int(num_ch-1)):
-        array_intercept_minus[j1][i1+1] = func_intercept(math.tan(array_alpha_minus[j1][i1+1]),array_point[j1][i1+1])
-        array_intercept_plus[j1+1][i1] = func_intercept(math.tan(array_alpha_plus[j1+1][i1]),array_point[j1+1][i1])
-        x_cross, y_cross = func_cross([math.tan(array_alpha_minus[j1][i1+1]),math.tan(array_alpha_plus[j1+1][i1])], \
-            [array_intercept_minus[j1][i1+1],array_intercept_plus[j1+1][i1]])
-        array_point[j1+1][i1+1] = np.array([x_cross, y_cross])
-
-# print("///array_alpha_plus///")
-# print(array_alpha_plus*360./2./np.pi)
-# print("///array_alpha_minus///")
-# print(array_alpha_minus*360./2./np.pi)
-# print("///array_intercept_plus///")
-# print(array_intercept_plus)
-# print("///array_intercept_minus///")
-# print(array_intercept_minus)
-# print("///array_point_A///")
-# print(array_point)
-
-for j1 in range(int(num_ch-1)):
-    for i1 in range(int(num_ch-1)):
-        graph0.func_graph_add((array_point[j1][i1+1][0], array_point[j1+1][i1+1][0]), \
-            (array_point[j1][i1+1][1], array_point[j1+1][i1+1][1]))
-        graph0.func_graph_add((array_point[j1+1][i1][0], array_point[j1+1][i1+1][0]), \
-            (array_point[j1+1][i1][1], array_point[j1+1][i1+1][1]))
+        array_alpha_plus[j1][i1] = (array_theta[j1-1][i1]+array_beta[j1-1][i1])/2. + (array_theta[j1][i1]+array_beta[j1][i1])/2.
+        array_alpha_minus[j1][i1] = (array_theta[j1+1][i1-1]-array_beta[j1+1][i1-1])/2. + (array_theta[j1][i1]-array_beta[j1][i1])/2.
         
+        array_itnercept_plus[j1][i1] = func_intercept(math.tan(array_alpha_plus[j1][i1]), (array_x[j1][i1], array_y[j1][i1]))
+        array_itnercept_minus[j1][i1] = func_intercept(math.tan(array_alpha_minus[j1][i1]), (array_x[j1][i1], array_y[j1][i1]))
 
-### 本当であれば一般化したかったが
-### 無理矢理燃焼器壁面＆すべり面の境界を代入し申す
-### 燃焼器底部との交点
-for i1 in range(1, int(num_ch)):
-    x_cross, y_cross = func_cross([0.,math.tan(array_alpha_minus[-2][i1])], \
-        [0.,array_intercept_minus[-2][i1]]) # array_alpha(or intercept)_minusの格納方向がくそなので
-    array_point[-1][i1] = np.array([x_cross, y_cross])
-### すべり面との交点
-for j1 in range(1, int(num_ch)):
-    x_cross, y_cross = func_cross([slope_sl,math.tan(array_alpha_plus[j1][-2])], \
-        [intercept_sl,array_intercept_plus[j1][-2]])
-    array_point[j1][-1] = np.array([x_cross, y_cross])
-### 描画
-for i1 in range(int(num_ch)):
-    graph0.func_graph_add((array_point[-2][i1][0], array_point[-1][i1][0]), \
-        (array_point[-2][i1][1], array_point[-1][i1][1]))
-for j1 in range(int(num_ch)):
-    graph0.func_graph_add((array_point[j1][-2][0], array_point[j1][-1][0]), \
-        (array_point[j1][-2][1], array_point[j1][-1][1]))
-
-
-
+        ### array_x
+        ### array_y
+        if j1 <= (2*num_ch-4):
+            array_x[j1+1][i1], array_y[j1+1][i1] = func_cross((math.tan(array_alpha_plus[j1+1+1][i1-1]),math.tan(array_alpha_minus[j1][i1])), \
+                (array_itnercept_plus[j1+1+1][i1-1], array_itnercept_minus[j1][i1]))
+    
+    
+    ### 下側反射
+    array_theta[-1][i1] = angle_bottom
+    array_neu[-1][i1] = array_neu[-2][i1]+array_theta[-2][i1] - array_theta[-1][i1]
+    array_Mach[-1][i1] = func_neu2Mach(array_neu[-1][i1])
+    array_beta[-1][i1] = math.asin(1./array_Mach[-1][i1])
+    array_alpha_plus[-1][i1] = (array_theta[-2][i1]+array_beta[-2][i1])/2. + (array_theta[-1][i1]+array_beta[-1][i1])/2.
+    array_alpha_minus[-1][i1] = 0.
+    array_itnercept_plus[-1][i1] = func_intercept(math.tan(array_alpha_plus[-1][i1]), (array_x[-1][i1], array_y[-1][i1]))
+    array_itnercept_minus[-1][i1] = 0.
+    array_x[-1][i1], array_y[-1][i1] = func_cross((math.tan(array_alpha_plus[-1][i1]), math.tan(angle_bottom)), \
+        (array_itnercept_plus[-1][i1], 0.))
 
 
 
@@ -420,8 +474,50 @@ for j1 in range(int(num_ch)):
 
 
 
+print("///array_theta///", array_theta.shape)
+print(array_theta*360./2./np.pi)
+print("///array_neu///", array_neu.shape)
+print(array_neu*360./2./np.pi)
+
+# array_plus = np.round((array_theta + array_neu),2)
+# array_minus = np.round((array_theta - array_neu),2)
+# print("///theta + neu///", array_theta.shape)
+# print(array_plus*360./2./np.pi)
+# print("///theta - neu///", array_neu.shape)
+# print(array_minus*360./2./np.pi)
+
+print("///array_Mach///", array_Mach.shape)
+print(array_Mach)
+print("///array_beta///", array_beta.shape)
+print(array_beta*360./2./np.pi)
+
+print("///array_alpha_plus///", array_alpha_plus.shape)
+print(array_alpha_plus)
+print("///array_alpha_minus///", array_alpha_minus.shape)
+print(array_alpha_minus)
+
+print("///array_intercept_plus///", array_itnercept_plus.shape)
+print(np.round(array_itnercept_plus,2))
+print("///array_intercept_minus///", array_itnercept_minus.shape)
+print(np.round(array_itnercept_minus,2))
+
+
+print("///array_x///", array_x.shape)
+# print(np.round(array_x,2))
+print(array_x)
+print("///array_y///", array_y.shape)
+print(np.round(array_y,2))
+
+
+# print("so far ok_20210922")
+
+
+
+graph0.func_scatter_add(array_x,array_y)
 
 graph0.func_show()
+
+
 
 
 
