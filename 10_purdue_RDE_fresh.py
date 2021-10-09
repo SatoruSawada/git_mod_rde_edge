@@ -24,7 +24,8 @@ from matplotlib import colors, interactive
 import numpy as np
 import matplotlib.pylab as plt
 from numpy.core.defchararray import array
-np.set_printoptions(precision=3)
+np.set_printoptions(precision=2)
+np.set_printoptions(suppress=True)
 
 class CL_graph_setting:
     def __init__(self):
@@ -223,7 +224,7 @@ angle_dw = 105. / 360. * 2. * np.pi # [rad]: detonation angle from horizontal ax
 height_dw = 1.0 # [-]: injection fill height normalized by deto_height (z axis)
 ## deto波描画
 ## そういえばatanの値域って -np.pi/2. ~ +np.pi/2. だったっけか 
-array_point_dw = (height_dw*math.atan(-(angle_dw-np.pi/2.)), height_dw)
+array_point_dw = (height_dw*math.tan(-(angle_dw-np.pi/2.)), height_dw)
 graph0.func_graph_add((0., array_point_dw[0]), (0., array_point_dw[1]), color="r")
 
 #------------------------------------------------------------------
@@ -231,7 +232,7 @@ graph0.func_graph_add((0., array_point_dw[0]), (0., array_point_dw[1]), color="r
 #------------------------------------------------------------------
 ## 「detonation wave」と「fresh mixture layer」のどちらを先に描画するべきなのか分からないからとりあえず
 angle_fm = 15. / 360. * 2. * np.pi # deto_angle - np.pi/2.
-slope_fm = math.atan(angle_fm)
+slope_fm = math.tan(angle_fm)
 intercept_fm = func_intercept(slope_fm, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_fm), (0., intercept_fm))
 graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="b")
@@ -240,7 +241,7 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 #### 0. assumptions for slip line
 #------------------------------------------------------------------
 angle_sl = 30. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
-slope_sl = math.atan(angle_sl)
+slope_sl = math.tan(angle_sl)
 intercept_sl = func_intercept(slope_sl, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_sl), (rde_l, intercept_sl))
 graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="b")
@@ -249,7 +250,7 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 #### 0. assumptions for oblique-shock
 #------------------------------------------------------------------
 angle_os = 60. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
-slope_os = math.atan(angle_os)
+slope_os = math.tan(angle_os)
 intercept_os = func_intercept(slope_os, array_point_dw)
 x_cross, y_cross = func_cross((0, slope_os), (rde_l, intercept_os))
 graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="r")
@@ -304,21 +305,25 @@ angle_bottom = 0. * 2. * np.pi /360.
 #------------------------------------------------------------------
 #### 1. characteristic lines -1st
 #------------------------------------------------------------------
-
-num_ch = 7 # number of characteristic lines
+### num_chの謎の発散の限界30くらい？
+### 理由は分からぬ
+num_ch = 4 # number of characteristic lines
 
 ### i方向（横）にtheta-neu=const.確認
 ### j方向（縦）にtheta+neu=const.確認
 
-array_zero = np.zeros((int(num_ch-1),int(num_ch)))
+array_zero0 = np.zeros((int(num_ch-1),int(num_ch)))
+array_zero1 = np.zeros((int(2*num_ch-1),int(num_ch)))
+
 
 ### theta
 array_theta_up = np.linspace(angle_fm,angle_sl,num_ch)
 array_theta = np.flipud(np.diag(array_theta_up))
 array_theta = np.delete(array_theta,-1,0)
 array_theta_down = np.linspace(angle_fm,angle_bottom,num_ch)
-array_theta_down = np.transpose(np.vstack((array_theta_down,array_zero)))
+array_theta_down = np.transpose(np.vstack((array_theta_down,array_zero0)))
 array_theta = np.vstack((array_theta,array_theta_down))
+array_theta = np.hstack((array_theta, array_zero1))
 del array_theta_up
 del array_theta_down
 
@@ -345,12 +350,16 @@ array_beta_down = np.zeros((int(num_ch)))
 for i0 in range(int(num_ch)):
     array_Mach_down[i0] = func_neu2Mach(array_neu_down[i0])
     array_beta_down[i0] = math.asin(1./array_Mach_down[i0])
-array_neu_down = np.transpose(np.vstack((array_neu_down,array_zero)))
-array_Mach_down = np.transpose(np.vstack((array_Mach_down,array_zero)))
-array_beta_down = np.transpose(np.vstack((array_beta_down,array_zero)))
+array_neu_down = np.transpose(np.vstack((array_neu_down,array_zero0)))
+array_Mach_down = np.transpose(np.vstack((array_Mach_down,array_zero0)))
+array_beta_down = np.transpose(np.vstack((array_beta_down,array_zero0)))
 array_neu = np.vstack((array_neu,array_neu_down))
 array_Mach = np.vstack((array_Mach,array_Mach_down))
 array_beta = np.vstack((array_beta,array_beta_down))
+### array_neu&Mach&beta のすべり面要素は未知のため，そのままarray_zero1を与える
+array_neu = np.hstack((array_neu, array_zero1))
+array_Mach = np.hstack((array_Mach, array_zero1))
+array_beta = np.hstack((array_beta, array_zero1))
 del array_neu_up
 del array_neu_down
 del array_Mach_up
@@ -366,8 +375,10 @@ array_alpha_plus_down = np.zeros((int(num_ch)))
 for i0 in range(1, int(num_ch)):
     array_alpha_plus_down[i0] = (array_theta[int(num_ch-2)+i0][0]+array_beta[int(num_ch-2)+i0][0])/2. + \
         (array_theta[int(num_ch-2)+i0+1][0]+array_beta[int(num_ch-2)+i0+1][0])/2.
-array_alpha_plus_down = np.transpose(np.vstack((array_alpha_plus_down,array_zero)))
+array_alpha_plus_down = np.transpose(np.vstack((array_alpha_plus_down,array_zero0)))
 array_alpha_plus = np.vstack((array_alpha_plus,array_alpha_plus_down))
+### array_alpha_plus のすべり面要素は未知のため，そのままarray_zero1を与える
+array_alpha_plus = np.hstack((array_alpha_plus,array_zero1))
 del array_alpha_plus_up
 del array_alpha_plus_down
 
@@ -378,43 +389,50 @@ for i0 in range(1,int(num_ch)):
 array_alpha_minus = np.flipud(np.diag(array_alpha_minus_up))
 array_alpha_minus = np.delete(array_alpha_minus,-1,0)
 array_alpha_minus_down = np.zeros((int(num_ch)))
-array_alpha_minus_down = np.transpose(np.vstack((array_alpha_minus_down,array_zero)))
+array_alpha_minus_down = np.transpose(np.vstack((array_alpha_minus_down,array_zero0)))
 array_alpha_minus = np.vstack((array_alpha_minus,array_alpha_minus_down))
+### array_alpha_minus のすべり面要素は未知のため，そのままarray_zero1を与える
+array_alpha_minus = np.hstack((array_alpha_minus,array_zero1))
 del array_alpha_minus_up
 del array_alpha_minus_down
 
 
 ### intercept_plus, intercept_minus
-array_itnercept_plus_up = np.zeros((int(num_ch)))
-array_itnercept_plus = np.flipud(np.diag(array_itnercept_plus_up))
-array_itnercept_plus = np.delete(array_itnercept_plus,-1,0)
-array_itnercept_plus_down = np.zeros((int(num_ch)))
+array_intercept_plus_up = np.zeros((int(num_ch)))
+array_intercept_plus = np.flipud(np.diag(array_intercept_plus_up))
+array_intercept_plus = np.delete(array_intercept_plus,-1,0)
+array_intercept_plus_down = np.zeros((int(num_ch)))
 for i0 in range(1, int(num_ch)):
-    array_itnercept_plus_up[i0] = func_intercept(array_alpha_plus[int(num_ch-2)+i0+1][0], (0.,0.)) ### ただの原点
-array_itnercept_plus_down = np.transpose(np.vstack((array_itnercept_plus_down,array_zero)))
-array_itnercept_plus = np.vstack((array_itnercept_plus,array_itnercept_plus_down))
-del array_itnercept_plus_up
-del array_itnercept_plus_down
+    array_intercept_plus_up[i0] = func_intercept(array_alpha_plus[int(num_ch-2)+i0+1][0], (0.,0.)) ### ただの原点
+array_intercept_plus_down = np.transpose(np.vstack((array_intercept_plus_down,array_zero0)))
+array_intercept_plus = np.vstack((array_intercept_plus,array_intercept_plus_down))
+### array_intercept_plus のすべり面要素は未知のため，そのままarray_zero1を与える
+array_intercept_plus = np.hstack((array_intercept_plus,array_zero1))
+del array_intercept_plus_up
+del array_intercept_plus_down
 
-array_itnercept_minus_up = np.zeros((int(num_ch)))
+array_intercept_minus_up = np.zeros((int(num_ch)))
 for i0 in range(int(num_ch)):
-    array_itnercept_minus_up[i0] = func_intercept(array_alpha_minus[int(num_ch)-i0-1][i0], array_point_dw)
-array_itnercept_minus = np.flipud(np.diag(array_itnercept_minus_up))
-array_itnercept_minus = np.delete(array_itnercept_minus,-1,0)
-array_itnercept_minus_down = np.zeros((int(num_ch)))
-array_itnercept_minus_down = np.transpose(np.vstack((array_itnercept_minus_down,array_zero)))
-array_itnercept_minus = np.vstack((array_itnercept_minus,array_itnercept_minus_down))
-del array_itnercept_minus_up
-del array_itnercept_minus_down
-
+    array_intercept_minus_up[i0] = func_intercept(array_alpha_minus[int(num_ch)-i0-1][i0], array_point_dw)
+array_intercept_minus = np.flipud(np.diag(array_intercept_minus_up))
+array_intercept_minus = np.delete(array_intercept_minus,-1,0)
+array_intercept_minus_down = np.zeros((int(num_ch)))
+array_intercept_minus_down = np.transpose(np.vstack((array_intercept_minus_down,array_zero0)))
+array_intercept_minus = np.vstack((array_intercept_minus,array_intercept_minus_down))
+### array_intercept_minus のすべり面要素は未知のため，そのままarray_zero1を与える
+array_intercept_minus = np.hstack((array_intercept_minus,array_zero1))
+del array_intercept_minus_up
+del array_intercept_minus_down
 
 ### x
 array_x_up = np.ones((int(num_ch))) * array_point_dw[0]
 array_x = np.flipud(np.diag(array_x_up))
 array_x = np.delete(array_x,-1,0)
 array_x_down = np.zeros((int(num_ch)))
-array_x_down = np.transpose(np.vstack((array_x_down,array_zero)))
+array_x_down = np.transpose(np.vstack((array_x_down,array_zero0)))
 array_x = np.vstack((array_x,array_x_down))
+### array_x のすべり面要素は未知のため，そのままarray_zero1を与える
+array_x = np.hstack((array_x,array_zero1))
 del array_x_up
 del array_x_down
 
@@ -423,18 +441,19 @@ array_y_up = np.ones((int(num_ch))) * array_point_dw[1]
 array_y = np.flipud(np.diag(array_y_up))
 array_y = np.delete(array_y,-1,0)
 array_y_down = np.zeros((int(num_ch)))
-array_y_down = np.transpose(np.vstack((array_y_down,array_zero)))
+array_y_down = np.transpose(np.vstack((array_y_down,array_zero0)))
 array_y = np.vstack((array_y,array_y_down))
+### array_y のすべり面要素は未知のため，そのままarray_zero1を与える
+array_y = np.hstack((array_y, array_zero1))
 del array_y_up
 del array_y_down
+
+del array_zero0
+del array_zero1
 
 
 ### 
 for i1 in range(1,int(num_ch)):
-
-    ### array_x, array_y の一要素目は先に与えなければならない
-    array_x[int(num_ch-i1)][i1], array_y[int(num_ch-i1)][i1] = func_cross((math.tan(array_alpha_plus[int(num_ch-i1)+1][i1-1]),math.tan(array_alpha_minus[int(num_ch-i1)-1][i1])), \
-        (array_itnercept_plus[int(num_ch-i1)+1][i1-1], array_itnercept_minus[int(num_ch-i1)-1][i1]))
 
     for j1 in range(int(num_ch-i1), int(2.*num_ch-2)):
         array_theta[j1][i1] = (array_neu[j1-1][i1]-array_neu[j1+1][i1-1])/2. + \
@@ -445,17 +464,15 @@ for i1 in range(1,int(num_ch)):
         array_beta[j1][i1] = math.asin(1./array_Mach[j1][i1])
         array_alpha_plus[j1][i1] = (array_theta[j1-1][i1]+array_beta[j1-1][i1])/2. + (array_theta[j1][i1]+array_beta[j1][i1])/2.
         array_alpha_minus[j1][i1] = (array_theta[j1+1][i1-1]-array_beta[j1+1][i1-1])/2. + (array_theta[j1][i1]-array_beta[j1][i1])/2.
-        
-        array_itnercept_plus[j1][i1] = func_intercept(math.tan(array_alpha_plus[j1][i1]), (array_x[j1][i1], array_y[j1][i1]))
-        array_itnercept_minus[j1][i1] = func_intercept(math.tan(array_alpha_minus[j1][i1]), (array_x[j1][i1], array_y[j1][i1]))
 
-        ### array_x
-        ### array_y
-        if j1 <= (2*num_ch-4):
-            array_x[j1+1][i1], array_y[j1+1][i1] = func_cross((math.tan(array_alpha_plus[j1+1+1][i1-1]),math.tan(array_alpha_minus[j1][i1])), \
-                (array_itnercept_plus[j1+1+1][i1-1], array_itnercept_minus[j1][i1]))
-    
-    
+        if j1 <= (2*num_ch-3): # array_x&y[-2(2*num_ch-3)]以降の範囲は array_intercept_plus が存在しないので計算できない
+            array_x[j1][i1], array_y[j1][i1] = func_cross((math.tan(array_alpha_plus[j1+1][i1-1]),math.tan(array_alpha_minus[j1-1][i1])), \
+                (array_intercept_plus[j1+1][i1-1], array_intercept_minus[j1-1][i1]))
+
+        if j1 <= (2*num_ch-3): # array_intercept_plus&minus[-2(2*num_ch-4)]以降の範囲は array_が存在しないので計算できない
+            array_intercept_plus[j1][i1] = func_intercept(math.tan(array_alpha_plus[j1][i1]), (array_x[j1][i1], array_y[j1][i1]))
+            array_intercept_minus[j1][i1] = func_intercept(math.tan(array_alpha_minus[j1][i1]), (array_x[j1][i1], array_y[j1][i1]))
+
     ### 下側反射
     array_theta[-1][i1] = angle_bottom
     array_neu[-1][i1] = array_neu[-2][i1]+array_theta[-2][i1] - array_theta[-1][i1]
@@ -463,10 +480,52 @@ for i1 in range(1,int(num_ch)):
     array_beta[-1][i1] = math.asin(1./array_Mach[-1][i1])
     array_alpha_plus[-1][i1] = (array_theta[-2][i1]+array_beta[-2][i1])/2. + (array_theta[-1][i1]+array_beta[-1][i1])/2.
     array_alpha_minus[-1][i1] = 0.
-    array_itnercept_plus[-1][i1] = func_intercept(math.tan(array_alpha_plus[-1][i1]), (array_x[-1][i1], array_y[-1][i1]))
-    array_itnercept_minus[-1][i1] = 0.
-    array_x[-1][i1], array_y[-1][i1] = func_cross((math.tan(array_alpha_plus[-1][i1]), math.tan(angle_bottom)), \
-        (array_itnercept_plus[-1][i1], 0.))
+    array_x[-1][i1], array_y[-1][i1] = func_cross((math.tan(array_alpha_minus[-2][i1]), math.tan(angle_bottom)), \
+        (array_intercept_minus[-2][i1], 0.))
+    array_intercept_plus[-1][i1] = func_intercept(math.tan(array_alpha_plus[-1][i1]), (array_x[-1][i1], array_y[-1][i1]))
+    array_intercept_minus[-1][i1] = 0.
+
+
+
+
+
+
+ 
+for i1 in range(int(num_ch),int(num_ch*2)):
+    ### 上側反射（上側反射の計算があるせいでこれまでのと合わせて一般化することは難しい）
+    array_theta[0][i1] = angle_sl
+    array_neu[0][i1] = array_neu[1][i1-1]-array_theta[1][i1-1] + array_theta[0][i1]
+    array_Mach[0][i1] = func_neu2Mach(array_neu[0][i1])
+    array_beta[0][i1] = math.asin(1./array_Mach[0][i1])
+    array_alpha_plus[0][i1] = 0.
+    array_alpha_minus[0][i1] = (array_theta[1][i1-1]-array_beta[1][i1-1])/2. + (array_theta[0][i1]-array_beta[0][i1])/2.
+    array_x[0][i1], array_y[0][i1] = func_cross((math.tan(array_alpha_plus[1][i1-1]), math.tan(angle_sl)), \
+        (array_intercept_plus[1][i1-1], intercept_sl))
+    array_intercept_plus[0][i1] = 0.
+    array_intercept_minus[0][i1] = func_intercept(math.tan(array_alpha_minus[0][i1]), (array_x[0][i1], array_y[0][i1]))
+    
+    
+
+    for j1 in range(1, int(2.*num_ch-2)):
+        # for j1 in range(1, int(2.*num_ch-2+(-i1+2))):
+        array_theta[j1][i1] = (array_neu[j1-1][i1]-array_neu[j1+1][i1-1])/2. + \
+             (array_theta[j1-1][i1]+array_theta[j1+1][i1-1])/2.
+        array_neu[j1][i1] = (array_neu[j1-1][i1]+array_neu[j1+1][i1-1])/2. + \
+             (array_theta[j1-1][i1]-array_theta[j1+1][i1-1])/2.
+        array_Mach[j1][i1] = func_neu2Mach(array_neu[j1][i1])
+        array_beta[j1][i1] = math.asin(1./array_Mach[j1][i1])
+        array_alpha_plus[j1][i1] = (array_theta[j1-1][i1]+array_beta[j1-1][i1])/2. + (array_theta[j1][i1]+array_beta[j1][i1])/2.
+        array_alpha_minus[j1][i1] = (array_theta[j1+1][i1-1]-array_beta[j1+1][i1-1])/2. + (array_theta[j1][i1]-array_beta[j1][i1])/2.
+
+        if j1 <= (2*num_ch-3): # array_x&y[-2(2*num_ch-3)]以降の範囲は array_intercept_plus が存在しないので計算できない
+            array_x[j1][i1], array_y[j1][i1] = func_cross((math.tan(array_alpha_plus[j1+1][i1-1]),math.tan(array_alpha_minus[j1-1][i1])), \
+                (array_intercept_plus[j1+1][i1-1], array_intercept_minus[j1-1][i1]))
+
+        if j1 <= (2*num_ch-3): # array_intercept_plus&minus[-2(2*num_ch-4)]以降の範囲は array_が存在しないので計算できない
+            array_intercept_plus[j1][i1] = func_intercept(math.tan(array_alpha_plus[j1][i1]), (array_x[j1][i1], array_y[j1][i1]))
+            array_intercept_minus[j1][i1] = func_intercept(math.tan(array_alpha_minus[j1][i1]), (array_x[j1][i1], array_y[j1][i1]))
+
+
 
 
 
@@ -496,10 +555,12 @@ print(array_alpha_plus)
 print("///array_alpha_minus///", array_alpha_minus.shape)
 print(array_alpha_minus)
 
-print("///array_intercept_plus///", array_itnercept_plus.shape)
-print(np.round(array_itnercept_plus,2))
-print("///array_intercept_minus///", array_itnercept_minus.shape)
-print(np.round(array_itnercept_minus,2))
+print("///array_intercept_plus///", array_intercept_plus.shape)
+# print(np.round(array_intercept_plus,2))
+print(array_intercept_plus)
+print("///array_intercept_minus///", array_intercept_minus.shape)
+# print(np.round(array_intercept_minus,2))
+print(array_intercept_minus)
 
 
 print("///array_x///", array_x.shape)
