@@ -220,7 +220,7 @@ graph0.func_rde_exit(rde_l)
 #------------------------------------------------------------------
 ## deto波と燃焼室底面の接点はどの条件であろうと不変である -> 原点 （本番でもこのつもり）
 ## この計算では「deto_height」固定
-angle_dw = 105. / 360. * 2. * np.pi # [rad]: detonation angle from horizontal axis (theta axis)
+angle_dw = 100. / 360. * 2. * np.pi # [rad]: detonation angle from horizontal axis (theta axis)
 height_dw = 1.0 # [-]: injection fill height normalized by deto_height (z axis)
 ## deto波描画
 ## そういえばatanの値域って -np.pi/2. ~ +np.pi/2. だったっけか 
@@ -231,7 +231,7 @@ graph0.func_graph_add((0., array_point_dw[0]), (0., array_point_dw[1]), color="r
 #### 0. assumptions for fresh mixture layer
 #------------------------------------------------------------------
 ## 「detonation wave」と「fresh mixture layer」のどちらを先に描画するべきなのか分からないからとりあえず
-angle_fm = 15. / 360. * 2. * np.pi # deto_angle - np.pi/2.
+angle_fm = 10. / 360. * 2. * np.pi # deto_angle - np.pi/2.
 slope_fm = math.tan(angle_fm)
 intercept_fm = func_intercept(slope_fm, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_fm), (0., intercept_fm))
@@ -240,51 +240,51 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 #------------------------------------------------------------------
 #### 0. assumptions for slip line
 #------------------------------------------------------------------
-angle_sl = 30. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
+angle_sl = 20. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
 slope_sl = math.tan(angle_sl)
 intercept_sl = func_intercept(slope_sl, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_sl), (rde_l, intercept_sl))
 graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="b")
 
-#------------------------------------------------------------------
-#### 0. assumptions for oblique-shock
-#------------------------------------------------------------------
-angle_os = 60. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
-slope_os = math.tan(angle_os)
-intercept_os = func_intercept(slope_os, array_point_dw)
-x_cross, y_cross = func_cross((0, slope_os), (rde_l, intercept_os))
-graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="r")
+# #------------------------------------------------------------------
+# #### 0. assumptions for oblique-shock
+# #------------------------------------------------------------------
+# angle_os = 60. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
+# slope_os = math.tan(angle_os)
+# intercept_os = func_intercept(slope_os, array_point_dw)
+# x_cross, y_cross = func_cross((0, slope_os), (rde_l, intercept_os))
+# graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross), color="r")
 
-#------------------------------------------------------------------
-#### 0. assumptions for dw (2nd)
-#------------------------------------------------------------------
-## deto波と燃焼室底面の接点はどの条件であろうと不変である -> 原点 （本番でもこのつもり）
-## この計算では「deto_height」固定
-## deto波描画
-## そういえばatanの値域って -np.pi/2. ~ +np.pi/2. だったっけか 
-array_point_dw_2nd = (2.*np.pi-1.*math.tan(angle_fm), height_dw)
-graph0.func_graph_add((2.*np.pi, array_point_dw_2nd[0]), (0., array_point_dw_2nd[1]), color="r")
+# #------------------------------------------------------------------
+# #### 0. assumptions for dw (2nd)
+# #------------------------------------------------------------------
+# ## deto波と燃焼室底面の接点はどの条件であろうと不変である -> 原点 （本番でもこのつもり）
+# ## この計算では「deto_height」固定
+# ## deto波描画
+# ## そういえばatanの値域って -np.pi/2. ~ +np.pi/2. だったっけか 
+# array_point_dw_2nd = (2.*np.pi-1.*math.tan(angle_fm), height_dw)
+# graph0.func_graph_add((2.*np.pi, array_point_dw_2nd[0]), (0., array_point_dw_2nd[1]), color="r")
 
-#------------------------------------------------------------------
-#### 0. assumptions for fresh-mixture (2nd)
-#------------------------------------------------------------------
-intercept_fm_2nd = func_intercept(slope_fm, array_point_dw_2nd)
-x_cross, y_cross = func_cross((0., slope_fm), (0., intercept_fm_2nd))
-graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], y_cross), color="b")
+# #------------------------------------------------------------------
+# #### 0. assumptions for fresh-mixture (2nd)
+# #------------------------------------------------------------------
+# intercept_fm_2nd = func_intercept(slope_fm, array_point_dw_2nd)
+# x_cross, y_cross = func_cross((0., slope_fm), (0., intercept_fm_2nd))
+# graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], y_cross), color="b")
 
-#------------------------------------------------------------------
-#### 0. assumptions for slip line (2nd)
-#------------------------------------------------------------------
-intercept_sl_2nd = func_intercept(slope_sl, array_point_dw_2nd)
-x_cross, y_cross = func_cross((0., slope_sl), (rde_l, intercept_sl_2nd))
-graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], y_cross), color="b")
+# #------------------------------------------------------------------
+# #### 0. assumptions for slip line (2nd)
+# #------------------------------------------------------------------
+# intercept_sl_2nd = func_intercept(slope_sl, array_point_dw_2nd)
+# x_cross, y_cross = func_cross((0., slope_sl), (rde_l, intercept_sl_2nd))
+# graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], y_cross), color="b")
 
-#------------------------------------------------------------------
-#### 0. assumptions for oblique-shock (2nd)
-#------------------------------------------------------------------
-intercept_os_2nd = func_intercept(slope_os, array_point_dw_2nd)
-x_cross, y_cross = func_cross((0, slope_os), (rde_l, intercept_os_2nd))
-graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], y_cross), color="r")
+# #------------------------------------------------------------------
+# #### 0. assumptions for oblique-shock (2nd)
+# #------------------------------------------------------------------
+# intercept_os_2nd = func_intercept(slope_os, array_point_dw_2nd)
+# x_cross, y_cross = func_cross((0, slope_os), (rde_l, intercept_os_2nd))
+# graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], y_cross), color="r")
 
 
 
@@ -307,7 +307,7 @@ angle_bottom = 0. * 2. * np.pi /360.
 #------------------------------------------------------------------
 ### num_chの謎の発散の限界30くらい？
 ### 理由は分からぬ
-num_ch = 4 # number of characteristic lines
+num_ch = 5 # number of characteristic lines
 
 ### i方向（横）にtheta-neu=const.確認
 ### j方向（縦）にtheta+neu=const.確認
@@ -403,7 +403,7 @@ array_intercept_plus = np.flipud(np.diag(array_intercept_plus_up))
 array_intercept_plus = np.delete(array_intercept_plus,-1,0)
 array_intercept_plus_down = np.zeros((int(num_ch)))
 for i0 in range(1, int(num_ch)):
-    array_intercept_plus_up[i0] = func_intercept(array_alpha_plus[int(num_ch-2)+i0+1][0], (0.,0.)) ### ただの原点
+    array_intercept_plus_up[i0] = func_intercept(math.tan(array_alpha_plus[int(num_ch-2)+i0+1][0]), (0.,0.)) ### ただの原点
 array_intercept_plus_down = np.transpose(np.vstack((array_intercept_plus_down,array_zero0)))
 array_intercept_plus = np.vstack((array_intercept_plus,array_intercept_plus_down))
 ### array_intercept_plus のすべり面要素は未知のため，そのままarray_zero1を与える
@@ -412,8 +412,8 @@ del array_intercept_plus_up
 del array_intercept_plus_down
 
 array_intercept_minus_up = np.zeros((int(num_ch)))
-for i0 in range(int(num_ch)):
-    array_intercept_minus_up[i0] = func_intercept(array_alpha_minus[int(num_ch)-i0-1][i0], array_point_dw)
+for i0 in range(1,int(num_ch)):
+    array_intercept_minus_up[i0] = func_intercept(math.tan(array_alpha_minus[int(num_ch)-i0-1][i0]), array_point_dw)
 array_intercept_minus = np.flipud(np.diag(array_intercept_minus_up))
 array_intercept_minus = np.delete(array_intercept_minus,-1,0)
 array_intercept_minus_down = np.zeros((int(num_ch)))
@@ -504,8 +504,8 @@ for i1 in range(int(num_ch),int(num_ch*2)):
     
     
 
-    for j1 in range(1, int(2.*num_ch-2)):
-        # for j1 in range(1, int(2.*num_ch-2+(-i1+2))):
+    # for j1 in range(1, int(2.*num_ch-2)):
+    for j1 in range(1, int(2.*num_ch-2+(-i1+1))):
         array_theta[j1][i1] = (array_neu[j1-1][i1]-array_neu[j1+1][i1-1])/2. + \
              (array_theta[j1-1][i1]+array_theta[j1+1][i1-1])/2.
         array_neu[j1][i1] = (array_neu[j1-1][i1]+array_neu[j1+1][i1-1])/2. + \
@@ -547,9 +547,9 @@ print("///array_beta///", array_beta.shape)
 print(array_beta*360./2./np.pi)
 
 print("///array_alpha_plus///", array_alpha_plus.shape)
-print(array_alpha_plus)
+print(array_alpha_plus*360./2./np.pi)
 print("///array_alpha_minus///", array_alpha_minus.shape)
-print(array_alpha_minus)
+print(array_alpha_minus*360./2./np.pi)
 
 print("///array_intercept_plus///", array_intercept_plus.shape)
 # print(np.round(array_intercept_plus,2))
