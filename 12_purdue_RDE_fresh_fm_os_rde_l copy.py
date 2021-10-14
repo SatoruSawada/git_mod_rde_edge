@@ -268,8 +268,11 @@ graph0.func_graph_add((2.*np.pi, array_point_dw_2nd[0]), (0., array_point_dw_2nd
 #------------------------------------------------------------------
 #### 0. assumptions for fresh-mixture (2nd)
 #------------------------------------------------------------------
-intercept_fm_2nd = func_intercept(slope_fm, array_point_dw_2nd)
-x_cross, y_cross = func_cross((0., slope_fm), (0., intercept_fm_2nd))
+# intercept_fm_2nd = func_intercept(slope_fm, array_point_dw_2nd)
+# x_cross, y_cross = func_cross((0., slope_fm), (0., intercept_fm_2nd))
+slope_fm_2nd = slope_fm * 2.
+intercept_fm_2nd = func_intercept(slope_fm_2nd, array_point_dw_2nd)
+x_cross, y_cross = func_cross((0., slope_fm_2nd), (0., intercept_fm_2nd))
 graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], y_cross), color="b")
 
 def func_fm(x):
@@ -305,7 +308,7 @@ angle_bottom = 0. * 2. * np.pi /360.
 #------------------------------------------------------------------
 ### num_chの謎の発散の限界30くらい？
 ### 理由は分からぬ
-num_ch = 30 # number of characteristic lines ======================================================================================here
+num_ch = 25 # number of characteristic lines ======================================================================================here
 
 ### i方向（横）にtheta-neu=const.確認
 ### j方向（縦）にtheta+neu=const.確認
