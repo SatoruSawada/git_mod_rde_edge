@@ -12,6 +12,7 @@ def func_cross_gas_dynamics(point1, point2, lambda1, lambda2): ### ごめん，�
 ### とりあえず vol.2 p.203 の例題にしたがって書いてみる
 def func_MEPC_theta3(theta1, theta2, point1, point2, point4, lambda_12, eps=10e-6):
     lambda_o = math.tan((theta1+theta2)/2.)
+    # print(lambda_o)
     delta = 1.0
     n=0
     while delta >= eps:
@@ -22,28 +23,29 @@ def func_MEPC_theta3(theta1, theta2, point1, point2, point4, lambda_12, eps=10e-
         lambda_o = lambda_o_new
         n += 1
         print(n)
+    print(lambda_o)
     return x, y, theta
 
 
-# theta1 = 18.191 / 360. *2.*np.pi
-# theta2 = 16.422 / 360. *2.*np.pi
-# x1 = 0.13146
-# y1 = 0.040118
-# x2 = 0.135683
-# y2 = 0.037123
-# lambda2 = -0.70921
-# x4 = 0.141335
-# y4 = 0.04061
+theta1 = 18.191 / 360. *2.*np.pi
+theta2 = 16.422 / 360. *2.*np.pi
+x1 = 0.13146
+y1 = 0.040118
+x2 = 0.135683
+y2 = 0.037123
+lambda12 = -0.70921
+x4 = 0.141335
+y4 = 0.04061
 
-theta1 = 0.22
-theta2 = 0.17
-x1 = -0.18
-y1 = 1.
-x2 = 0.
-y2 = 0.
-lambda12 = -5.67
-x4 = 0.23
-y4 = 0.56
+# theta1 = 0.22
+# theta2 = 0.17
+# x1 = -0.18
+# y1 = 1.
+# x2 = 0.
+# y2 = 0.
+# lambda12 = -5.67
+# x4 = 0.23
+# y4 = 0.56
 
 x, y, theta = func_MEPC_theta3(theta1,theta2,(x1,y1),(x2,y2),(x4,y4),lambda12)
 print(x, "///", y, "///", theta*360/2/np.pi)

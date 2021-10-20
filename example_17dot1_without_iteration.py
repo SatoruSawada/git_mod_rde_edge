@@ -361,118 +361,110 @@ for i in range(1,2):
         print("rho_4       ", array_rho[j][i])
 
 
-        ### set predictor
-        theta_3 = array_theta_3[j][i-1]
-        delta_c = 1.0
-        eps_c = 10e-6
+
+
 
         ### =====================================================================
         ### corrector : 全て入れなおせているのだろうか？
         ### =====================================================================
-        while delta_c >= eps_c:
-            #####################################################################################################(g)
-            ### along Mach line 24 (C+)
-            array_p_plus[j+1][i-1] = (array_p[j+1][i-1] + array_p[j][i]) /2.
-            array_theta_plus[j+1][i-1] = (array_theta[j+1][i-1] + array_theta[j][i]) /2.
-            array_V_plus[j+1][i-1] = (array_V[j+1][i-1] + array_V[j][i]) /2.
-            array_rho_plus[j+1][i-1] = (array_rho[j+1][i-1] + array_rho[j][i]) /2.
-            array_y_plus[j+1][i-1] = (array_y[j+1][i-1] + array_y[j][i]) /2.
-            # gas.DP = array_rho_plus[j][i], array_p_plus[j][i] ### RDE -> gas.SPX = s2, array_p_3[j][i], x2
-            # array_a_fr_plus[j][i] = soundspeed_fr(gas)
-            array_a_fr_plus[j+1][i-1] = np.sqrt((1.2*array_p_plus[j+1][i-1])/array_rho_plus[j+1][i-1]) ### gamma = 1.2
-            array_M_plus[j+1][i-1] = array_V_plus[j+1][i-1] / array_a_fr_plus[j+1][i-1]
-            array_alpha_plus[j+1][i-1] = np.arcsin(1./array_M_plus[j+1][i-1])
-            array_lambda_plus[j+1][i-1] = np.tan(array_theta_plus[j+1][i-1]+array_alpha_plus[j+1][i-1])
-            array_Q_plus[j+1][i-1] = np.sqrt(array_M_plus[j+1][i-1]**2.-1.) / (array_rho_plus[j+1][i-1]*array_V_plus[j+1][i-1]**2.)
-            array_S_plus[j+1][i-1] = np.sin(array_theta_plus[j+1][i-1]) / \
-                (array_y_plus[j+1][i-1]*array_M_plus[j+1][i-1]*np.cos(array_theta[j][i]+array_theta_plus[j+1][i-1]))
-            ### along Mach line 14 (C-)
-            array_p_minus[j-1][i] = (array_p[j-1][i] + array_p[j][i]) /2.
-            array_theta_minus[j-1][i] = (array_theta[j-1][i] + array_theta[j][i]) /2.
-            array_V_minus[j-1][i] = (array_V[j-1][i] + array_V[j][i]) /2.
-            array_rho_minus[j-1][i] = (array_rho[j-1][i] + array_rho[j][i]) /2.
-            array_y_minus[j-1][i] = (array_y[j-1][i] + array_y[j][i]) /2.
-            # gas.DP = array_rho_minus[j][i], array_p_minus[j][i] ### RDE -> gas.SPX = s2, array_p_minus[j][i], x2
-            # array_a_fr_minus[j][i] = soundspeed_fr(gas)
-            array_a_fr_minus[j-1][i] = np.sqrt((1.2*array_p_minus[j-1][i])/array_rho_minus[j-1][i]) ### gamma = 1.2
-            array_M_minus[j-1][i] = array_V_minus[j-1][i] / array_a_fr_minus[j-1][i]
-            array_alpha_minus[j-1][i] = np.arcsin(1./array_M_minus[j-1][i])
-            array_lambda_minus[j-1][i] = np.tan(array_theta_minus[j-1][i]-array_alpha_minus[j-1][i])
-            array_Q_minus[j-1][i] = np.sqrt(array_M_minus[j-1][i]**2.-1.) / (array_rho_minus[j-1][i]*array_V_minus[j-1][i]**2.)
-            array_S_minus[j-1][i] = np.sin(array_theta_minus[j-1][i]) / \
-                (array_y_minus[j-1][i]*array_M_minus[j-1][i]*np.cos(array_theta[j][i]-array_theta_minus[j-1][i]))
 
-            #####################################################################################################(h)
-            ### eq17dot44_eq17dot45
-            array_x[j][i], array_y[j][i] = func_cross_gas_dynamics(\
-                (array_x[j-1][i], array_y[j-1][i]),\
-                    (array_x[j+1][i-1], array_y[j+1][i-1]),\
-                        array_lambda_minus[j-1][i], \
-                            array_lambda_plus[j+1][i-1])
-            ### T+ & T- - eq17dot52_eq17dot53 (first step predictor
-            array_T_plus[j+1][i-1] = -array_S_plus[j+1][i-1] * (array_x[j][i]-array_x[j+1][i-1]) + \
-                array_Q_plus[j+1][i-1] * array_p[j+1][i-1] + array_theta[j+1][i-1]
-            array_T_minus[j-1][i] = -array_S_minus[j-1][i] * (array_x[j][i]-array_x[j-1][i]) + \
-                array_Q_minus[j-1][i] * array_p[j-1][i] - array_theta[j-1][i]
+        #####################################################################################################(g)
+        ### along Mach line 24 (C+)
+        array_p_plus[j+1][i-1] = (array_p[j+1][i-1] + array_p[j][i]) /2.
+        array_theta_plus[j+1][i-1] = (array_theta[j+1][i-1] + array_theta[j][i]) /2.
+        array_V_plus[j+1][i-1] = (array_V[j+1][i-1] + array_V[j][i]) /2.
+        array_rho_plus[j+1][i-1] = (array_rho[j+1][i-1] + array_rho[j][i]) /2.
+        array_y_plus[j+1][i-1] = (array_y[j+1][i-1] + array_y[j][i]) /2.
+        # gas.DP = array_rho_plus[j][i], array_p_plus[j][i] ### RDE -> gas.SPX = s2, array_p_3[j][i], x2
+        # array_a_fr_plus[j][i] = soundspeed_fr(gas)
+        array_a_fr_plus[j+1][i-1] = np.sqrt((1.2*array_p_plus[j+1][i-1])/array_rho_plus[j+1][i-1]) ### gamma = 1.2
+        array_M_plus[j+1][i-1] = array_V_plus[j+1][i-1] / array_a_fr_plus[j+1][i-1]
+        array_alpha_plus[j+1][i-1] = np.arcsin(1./array_M_plus[j+1][i-1])
+        array_lambda_plus[j+1][i-1] = np.tan(array_theta_plus[j+1][i-1]+array_alpha_plus[j+1][i-1])
+        array_Q_plus[j+1][i-1] = np.sqrt(array_M_plus[j+1][i-1]**2.-1.) / (array_rho_plus[j+1][i-1]*array_V_plus[j+1][i-1]**2.)
+        array_S_plus[j+1][i-1] = np.sin(array_theta_plus[j+1][i-1]) / \
+            (array_y_plus[j+1][i-1]*array_M_plus[j+1][i-1]*np.cos(array_theta[j][i]+array_theta_plus[j+1][i-1]))
+        ### along Mach line 14 (C-)
+        array_p_minus[j-1][i] = (array_p[j-1][i] + array_p[j][i]) /2.
+        array_theta_minus[j-1][i] = (array_theta[j-1][i] + array_theta[j][i]) /2.
+        array_V_minus[j-1][i] = (array_V[j-1][i] + array_V[j][i]) /2.
+        array_rho_minus[j-1][i] = (array_rho[j-1][i] + array_rho[j][i]) /2.
+        array_y_minus[j-1][i] = (array_y[j-1][i] + array_y[j][i]) /2.
+        # gas.DP = array_rho_minus[j][i], array_p_minus[j][i] ### RDE -> gas.SPX = s2, array_p_minus[j][i], x2
+        # array_a_fr_minus[j][i] = soundspeed_fr(gas)
+        array_a_fr_minus[j-1][i] = np.sqrt((1.2*array_p_minus[j-1][i])/array_rho_minus[j-1][i]) ### gamma = 1.2
+        array_M_minus[j-1][i] = array_V_minus[j-1][i] / array_a_fr_minus[j-1][i]
+        array_alpha_minus[j-1][i] = np.arcsin(1./array_M_minus[j-1][i])
+        array_lambda_minus[j-1][i] = np.tan(array_theta_minus[j-1][i]-array_alpha_minus[j-1][i])
+        array_Q_minus[j-1][i] = np.sqrt(array_M_minus[j-1][i]**2.-1.) / (array_rho_minus[j-1][i]*array_V_minus[j-1][i]**2.)
+        array_S_minus[j-1][i] = np.sin(array_theta_minus[j-1][i]) / \
+            (array_y_minus[j-1][i]*array_M_minus[j-1][i]*np.cos(array_theta[j][i]-array_theta_minus[j-1][i]))
 
-            #####################################################################################################(i)
-            ### eq17dot49 (the modified euler predictor-corrector)
-            ### eq17dot43_eq17dot46
-            # array_lambda_12[j-1][i] = (array_y[j+1][i-1] - array_y[j-1][i]) / (array_x[j+1][i-1] - array_x[j-1][i])
-            ### (theta3, theta4) -> corrector
-            array_lambda_o[j][i-1] = np.tan((array_theta_3[j][i-1]+array_theta[j][i])/2.)
-            # print("check==========================", array_theta[j-1][i]*360./2./np.pi)
-            # print("check==========================", array_theta[j+1][i-1]*360./2./np.pi)
-            # print("check==========================", (array_x[j-1][i], array_y[j-1][i]))
-            # print("check==========================", (array_x[j+1][i-1], array_y[j+1][i-1]))
-            # print("check==========================", (array_x[j][i], array_y[j][i]))
-            # print("check==========================", array_lambda_12[j-1][i])
-            # print("check==========================", array_lambda_o[j][i-1])
+        #####################################################################################################(h)
+        ### eq17dot44_eq17dot45
+        array_x[j][i], array_y[j][i] = func_cross_gas_dynamics(\
+            (array_x[j-1][i], array_y[j-1][i]),\
+                (array_x[j+1][i-1], array_y[j+1][i-1]),\
+                    array_lambda_minus[j-1][i], \
+                        array_lambda_plus[j+1][i-1])
+        ### T+ & T- - eq17dot52_eq17dot53 (first step predictor
+        array_T_plus[j+1][i-1] = -array_S_plus[j+1][i-1] * (array_x[j][i]-array_x[j+1][i-1]) + \
+            array_Q_plus[j+1][i-1] * array_p[j+1][i-1] + array_theta[j+1][i-1]
+        array_T_minus[j-1][i] = -array_S_minus[j-1][i] * (array_x[j][i]-array_x[j-1][i]) + \
+            array_Q_minus[j-1][i] * array_p[j-1][i] - array_theta[j-1][i]
 
-            array_x_3[j][i-1],\
-                array_y_3[j][i-1],\
-                    array_theta_3[j][i-1],\
-                        array_lambda_o[j][i-1] = func_MEPC_theta3(\
-                array_theta[j-1][i],\
-                    array_theta[j+1][i-1],\
-                        (array_x[j-1][i], array_y[j-1][i]),\
-                            (array_x[j+1][i-1], array_y[j+1][i-1]),\
-                                (array_x[j][i], array_y[j][i]),\
-                                    array_lambda_12[j-1][i],\
-                                        array_lambda_o[j][i-1])
-            ### interpolating for the remaining flow properties gives... (p.203) 
-            array_p_3[j][i-1] = array_p[j+1][i-1]+(array_y_3[j][i-1]-array_y[j+1][i-1])/(array_y[j-1][i]-array_y[j+1][i-1])*(array_p[j-1][i]-array_p[j+1][i-1])
-            array_rho_3[j][i-1] = array_rho[j+1][i-1]+(array_y_3[j][i-1]-array_y[j+1][i-1])/(array_y[j-1][i]-array_y[j+1][i-1])*(array_rho[j-1][i]-array_rho[j+1][i-1])
-            array_V_3[j][i-1] = array_V[j+1][i-1]+(array_y_3[j][i-1]-array_y[j+1][i-1])/(array_y[j-1][i]-array_y[j+1][i-1])*(array_V[j-1][i]-array_V[j+1][i-1])
+        #####################################################################################################(i)
+        ### eq17dot49 (the modified euler predictor-corrector)
+        ### eq17dot43_eq17dot46
+        # array_lambda_12[j-1][i] = (array_y[j+1][i-1] - array_y[j-1][i]) / (array_x[j+1][i-1] - array_x[j-1][i])
+        ### (theta3, theta4) -> corrector
+        array_lambda_o[j][i-1] = np.tan((array_theta_3[j][i-1]+array_theta[j][i])/2.)
+        # print("check==========================", array_theta[j-1][i]*360./2./np.pi)
+        # print("check==========================", array_theta[j+1][i-1]*360./2./np.pi)
+        # print("check==========================", (array_x[j-1][i], array_y[j-1][i]))
+        # print("check==========================", (array_x[j+1][i-1], array_y[j+1][i-1]))
+        # print("check==========================", (array_x[j][i], array_y[j][i]))
+        # print("check==========================", array_lambda_12[j-1][i])
+        # print("check==========================", array_lambda_o[j][i-1])
 
-            #####################################################################################################(j)
-            ### (start) ここで計算が「predictor」と「corrector」で異なる
-            array_p_o[j][i-1] = (array_p_3[j][i-1] + array_p[j][i]) / 2.
-            array_rho_o[j][i-1] = (array_rho_3[j][i-1] + array_rho[j][i]) / 2.
-            array_V_o[j][i-1] = (array_V_3[j][i-1] + array_V[j][i]) / 2.
-            ### (end) 
-            # gas.DP = array_rho_o[j][i], array_p_o[j][i]
-            # array_R_o[j][i] = ct.gas_constant / gas.mean_molecular_weight
-            # array_a_fr_3[j][i] = soundspeed_fr(gas)
-            array_a_fr_3[j][i-1] = np.sqrt((1.2*array_p_o[j][i-1])/array_rho_o[j][i-1]) ### gamma = 1.2
-            array_R_o[j][i-1] = array_rho_o[j][i-1] * array_V_o[j][i-1]
-            array_A_o[j][i-1] = array_a_fr_3[j][i-1] ** 2.
-            array_T_o1[j][i-1] = array_R_o[j][i-1] * array_V_3[j][i-1] + array_p_3[j][i-1] # using state3
-            array_T_o2[j][i-1] = array_p_3[j][i-1] - array_A_o[j][i-1] * array_rho_3[j][i-1] # using state3
+        array_x_3[j][i-1],\
+            array_y_3[j][i-1],\
+                array_theta_3[j][i-1],\
+                    array_lambda_o[j][i-1] = func_MEPC_theta3(\
+            array_theta[j-1][i],\
+                array_theta[j+1][i-1],\
+                    (array_x[j-1][i], array_y[j-1][i]),\
+                        (array_x[j+1][i-1], array_y[j+1][i-1]),\
+                            (array_x[j][i], array_y[j][i]),\
+                                array_lambda_12[j-1][i],\
+                                    array_lambda_o[j][i-1])
+        ### interpolating for the remaining flow properties gives... (p.203) 
+        array_p_3[j][i-1] = array_p[j+1][i-1]+(array_y_3[j][i-1]-array_y[j+1][i-1])/(array_y[j-1][i]-array_y[j+1][i-1])*(array_p[j-1][i]-array_p[j+1][i-1])
+        array_rho_3[j][i-1] = array_rho[j+1][i-1]+(array_y_3[j][i-1]-array_y[j+1][i-1])/(array_y[j-1][i]-array_y[j+1][i-1])*(array_rho[j-1][i]-array_rho[j+1][i-1])
+        array_V_3[j][i-1] = array_V[j+1][i-1]+(array_y_3[j][i-1]-array_y[j+1][i-1])/(array_y[j-1][i]-array_y[j+1][i-1])*(array_V[j-1][i]-array_V[j+1][i-1])
 
-            ### eq.(g) & (h) for calculating p4, theta4
-            array_p[j][i] = (array_T_plus[j+1][i-1] + array_T_minus[j-1][i]) / (array_Q_plus[j+1][i-1] + array_Q_minus[j-1][i])
-            array_theta[j][i] = array_T_plus[j+1][i-1] - array_Q_plus[j+1][i-1] * array_p[j][i]
+        #####################################################################################################(j)
+        ### (start) ここで計算が「predictor」と「corrector」で異なる
+        array_p_o[j][i-1] = (array_p_3[j][i-1] + array_p[j][i]) / 2.
+        array_rho_o[j][i-1] = (array_rho_3[j][i-1] + array_rho[j][i]) / 2.
+        array_V_o[j][i-1] = (array_V_3[j][i-1] + array_V[j][i]) / 2.
+        ### (end) 
+        # gas.DP = array_rho_o[j][i], array_p_o[j][i]
+        # array_R_o[j][i] = ct.gas_constant / gas.mean_molecular_weight
+        # array_a_fr_3[j][i] = soundspeed_fr(gas)
+        array_a_fr_3[j][i-1] = np.sqrt((1.2*array_p_o[j][i-1])/array_rho_o[j][i-1]) ### gamma = 1.2
+        array_R_o[j][i-1] = array_rho_o[j][i-1] * array_V_o[j][i-1]
+        array_A_o[j][i-1] = array_a_fr_3[j][i-1] ** 2.
+        array_T_o1[j][i-1] = array_R_o[j][i-1] * array_V_3[j][i-1] + array_p_3[j][i-1] # using state3
+        array_T_o2[j][i-1] = array_p_3[j][i-1] - array_A_o[j][i-1] * array_rho_3[j][i-1] # using state3
 
-            ### eq.(i) & (j) for calculating V4, rho4
-            array_V[j][i] = (array_T_o1[j][i-1]-array_p[j][i]) / array_R_o[j][i-1]
-            array_rho[j][i] = (array_p[j][i]-array_T_o2[j][i-1]) / array_A_o[j][i-1]
+        ### eq.(g) & (h) for calculating p4, theta4
+        array_p[j][i] = (array_T_plus[j+1][i-1] + array_T_minus[j-1][i]) / (array_Q_plus[j+1][i-1] + array_Q_minus[j-1][i])
+        array_theta[j][i] = array_T_plus[j+1][i-1] - array_Q_plus[j+1][i-1] * array_p[j][i]
 
-            ### delta_c
-            theta_3_new = array_theta_3[j][i-1]
-            delta_c = abs(theta_3-theta_3_new)
-            theta_3 = theta_3_new
-            
+        ### eq.(i) & (j) for calculating V4, rho4
+        array_V[j][i] = (array_T_o1[j][i-1]-array_p[j][i]) / array_R_o[j][i-1]
+        array_rho[j][i] = (array_p[j][i]-array_T_o2[j][i-1]) / array_A_o[j][i-1]
 
         print("===============================================================")
         print("corrector")
