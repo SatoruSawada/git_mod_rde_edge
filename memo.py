@@ -31,3 +31,8 @@
 
 ### 20211022_sawada
 ### 2列目で計算がうまくいかないのは列方向に更新していない何かがあるのでは？
+
+### 20211023_sawada 
+### predictor の state_4 のパラメーターが全部大きい -> 違う -> 正しい，S_add の補正のせいで勘違いした done
+### corrector の p_plus, theta_plus, V_plus 等を使用し始めると state 4 の値が大きくなる -> 違う done
+### R : 気体定数，R_o : rho*V のわけのわからない係数
