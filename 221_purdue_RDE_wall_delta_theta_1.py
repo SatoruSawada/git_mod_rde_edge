@@ -32,13 +32,13 @@ class CL_graph_setting:
         #### x軸
         self.x_label = 'radial direction [-]'
         self.x_min = -2.        #### x軸最小値
-        self.x_max = 8.        #### x軸最大値，目盛りの表示の都合でここに 0.00001 % 加算し申す
+        self.x_max = 22.        #### x軸最大値，目盛りの表示の都合でここに 0.00001 % 加算し申す
         self.x_main_dis = 2.   #### x軸主目盛り間隔
         # x_sub_num = 5       #### x軸主目盛り間の小目盛りの個数
         #### y軸
         self.y_label = 'azimuthal direction [-]'
         self.y_min = -1.        #### y軸最小値
-        self.y_max = 4.        #### y軸最大値，目盛りの表示の都合でここに 0.00001 % 加算し申す
+        self.y_max = 11.        #### y軸最大値，目盛りの表示の都合でここに 0.00001 % 加算し申す
         self.y_main_dis = 1.   #### y軸主目盛り間隔
         # y_sub_num = 5       #### y軸主目盛り間の小目盛りの個数
         #### 軸の大きさ・太さ
@@ -222,7 +222,7 @@ def func_MEPC_theta3(theta1, theta2, point1, point2, point4, lambda_12, eps=10e-
 #### 0. parameters
 #------------------------------------------------------------------
 # gamma = 1.4 # 比熱比[-]
-rde_l = 3.0 # [-]: RDE's combustion chamber length normalized by injection fill height 
+rde_l = 9.0 # [-]: RDE's combustion chamber length normalized by injection fill height 
 
 #------------------------------------------------------------------
 #### 0. graph_prepare
@@ -259,7 +259,7 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 #------------------------------------------------------------------
 #### 0. assumptions for slip line
 #------------------------------------------------------------------
-angle_sl = 38.5 / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
+angle_sl = 30. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
 slope_sl = np.tan(angle_sl)
 intercept_sl = func_intercept(slope_sl, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_sl), (rde_l, intercept_sl))
@@ -415,8 +415,8 @@ def func_M2P(M, eps=10e-6):
 #### 1. characteristic lines -1st
 #------------------------------------------------------------------
 ### num_ch_up & num_ch_down が小さすぎても問題（num_ch_up & num_ch_down >= 7）
-num_ch_up = 30 # number of initial characteristic lines (upper side)
-num_ch_down = 30 # number of initial characteristic lines (down side)
+num_ch_up = 20 # number of initial characteristic lines (upper side)
+num_ch_down = 10 # number of initial characteristic lines (down side)
 S_add = 0.5
 
 ### i方向（横）にtheta-neu=const.確認
@@ -461,7 +461,22 @@ del array_y_down
 ### 特性線とは違うし，あくまで区別してくれ
 ### theta
 ### neu, M, alpha
+
+### 流線角度：等差
 array_theta_up = np.linspace(angle_fm,angle_sl,num_ch_up)
+# print("array_theta_up1 ============", array_theta_up0 * 360. / 2./ np.pi)
+
+# ### 流線角度：差が増加
+# array_theta_up = np.linspace(0,num_ch_up,num_ch_up)
+# array_theta_up = array_theta_up * array_theta_up
+# array_theta_up_delta = angle_sl / array_theta_up[-1]
+# array_theta_up = array_theta_up * array_theta_up_delta
+# print("array_theta_up2 ============", array_theta_up * 360. / 2./ np.pi)
+
+### 流線角度：任意
+# array_theta_up = np.array([10., 10.001, 10.002, 12.5, 14., 17., 20., 24., 28., 30.])/360.*2.*np.pi
+# print("array_theta_up2 ============", array_theta_up * 360. / 2./ np.pi)
+
 array_neu_up = np.linspace(angle_fm,angle_sl,num_ch_up)
 array_neu_up = array_neu_up - angle_fm
 array_M_up = np.zeros((int(num_ch_up)))
@@ -513,7 +528,21 @@ array_gamma = np.delete(array_gamma,-1,0)
 
 
 #============================================================================
+### 流線角度：等差
 array_theta_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
+# print("array_theta_down 1 ============", array_theta_down0 * 360. / 2./ np.pi)
+
+### 流線角度：差が増加
+# array_theta_down = np.linspace(0,num_ch_down,num_ch_down)
+# array_theta_down = array_theta_down * array_theta_down
+# array_theta_down_delta = angle_fm / array_theta_down[-1]
+# array_theta_down = angle_fm - array_theta_down * array_theta_down_delta
+# print("array_theta_down 2 ============", array_theta_down * 360. / 2./ np.pi)
+
+### 流線角度：任意
+# array_theta_down = np.array([10., 9.9999999999, 9.9999999998, 9., 8., 6.5, 5., 2.5, 1., 0.])/360.*2.*np.pi
+# print("array_theta_down 2 ============", array_theta_down * 360. / 2./ np.pi)
+
 array_neu_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
 array_neu_down = angle_fm - array_neu_down
 array_M_down = np.zeros((int(num_ch_down)))
@@ -591,28 +620,28 @@ array_gamma = np.vstack((array_gamma,array_gamma_down))
 array_gamma = np.hstack((array_gamma, array_zero1))
 
 #============================================================================
-del array_theta_up
-del array_theta_down
-del array_neu_up
-del array_neu_down
-del array_M_up
-del array_M_down
-del array_alpha_up
-del array_alpha_down
-del array_p_up
-del array_p_down
-del array_t_up
-del array_t_down
-del array_R_up
-del array_R_down
-del array_rho_up
-del array_rho_down
-del array_a_fr_up
-del array_a_fr_down
-del array_V_up
-del array_V_down
-del array_gamma_up
-del array_gamma_down
+# del array_theta_up
+# del array_theta_down
+# del array_neu_up
+# del array_neu_down
+# del array_M_up
+# del array_M_down
+# del array_alpha_up
+# del array_alpha_down
+# del array_p_up
+# del array_p_down
+# del array_t_up
+# del array_t_down
+# del array_R_up
+# del array_R_down
+# del array_rho_up
+# del array_rho_down
+# del array_a_fr_up
+# del array_a_fr_down
+# del array_V_up
+# del array_V_down
+# del array_gamma_up
+# del array_gamma_down
 # ====
 
 ### あくまで特性線における値
