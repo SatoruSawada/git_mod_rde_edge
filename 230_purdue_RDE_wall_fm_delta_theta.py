@@ -31,15 +31,15 @@ class CL_graph_setting:
         #### ==================================================================================================================
         #### x軸
         self.x_label = 'radial direction [-]'
-        self.x_min = -2.        #### x軸最小値
-        self.x_max = 8.        #### x軸最大値，目盛りの表示の都合でここに 0.00001 % 加算し申す
-        self.x_main_dis = 2.   #### x軸主目盛り間隔
+        self.x_min = -0.02        #### x軸最小値
+        self.x_max = 0.24        #### x軸最大値，目盛りの表示の都合でここに 0.00001 % 加算し申す
+        self.x_main_dis = 0.02   #### x軸主目盛り間隔
         # x_sub_num = 5       #### x軸主目盛り間の小目盛りの個数
         #### y軸
         self.y_label = 'azimuthal direction [-]'
-        self.y_min = -1.        #### y軸最小値
-        self.y_max = 4.        #### y軸最大値，目盛りの表示の都合でここに 0.00001 % 加算し申す
-        self.y_main_dis = 1.   #### y軸主目盛り間隔
+        self.y_min = -0.01        #### y軸最小値
+        self.y_max = 0.12        #### y軸最大値，目盛りの表示の都合でここに 0.00001 % 加算し申す
+        self.y_main_dis = 0.01   #### y軸主目盛り間隔
         # y_sub_num = 5       #### y軸主目盛り間の小目盛りの個数
         #### 軸の大きさ・太さ
         self.major_width = 1.5    #### 軸主目盛りの線幅
@@ -124,6 +124,11 @@ class CL_graph_create(CL_graph_setting):
         list_x_axis_x = [-10e1, 10e1]
         list_x_axis_y = [rde_l, rde_l]
         self.ax.plot(list_x_axis_x, list_x_axis_y, color='k')
+
+    def func_2pi(self):
+        list_y_axis_x = [2.*np.pi*0.035, 2.*np.pi*0.035]
+        list_y_axis_y = [-10e1, 10e1]
+        self.ax.plot(list_y_axis_x, list_y_axis_y, color='k')
 
     def func_graph_add(self, list_x, list_y, color=None):
         #### ==================================================================================================================
@@ -222,7 +227,7 @@ def func_MEPC_theta3(theta1, theta2, point1, point2, point4, lambda_12, eps=10e-
 #### 0. parameters
 #------------------------------------------------------------------
 # gamma = 1.4 # 比熱比[-]
-rde_l = 3.0 # [-]: RDE's combustion chamber length normalized by injection fill height 
+rde_l = 0.1 # [-]: RDE's combustion chamber length normalized by injection fill height 
 
 #------------------------------------------------------------------
 #### 0. graph_prepare
@@ -240,7 +245,7 @@ graph0.func_rde_exit(rde_l)
 ## deto波と燃焼室底面の接点はどの条件であろうと不変である -> 原点 （本番でもこのつもり）
 ## この計算では「deto_height」固定
 angle_dw = 100. / 360. * 2. * np.pi # [rad]: detonation angle from horizontal axis (theta axis)
-height_dw = 1.0 # [-]: injection fill height normalized by deto_height (z axis)
+height_dw = 0.02 # [-]: injection fill height normalized by deto_height (z axis)
 ## deto波描画
 ## そういえばatanの値域って -np.pi/2. ~ +np.pi/2. だったっけか 
 array_point_dw = (height_dw*np.tan(-(angle_dw-np.pi/2.)), height_dw)
@@ -305,7 +310,6 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 # x_cross, y_cross = func_cross((0, slope_os), (rde_l, intercept_os_2nd))
 # graph0.func_graph_add((array_point_dw_2nd[0], x_cross), (array_point_dw_2nd[1], y_cross), color="r")
 
-
 angle_bottom = 0. * 2. * np.pi /360.
 
 #------------------------------------------------------------------
@@ -327,7 +331,7 @@ h1 = 379882.37074241653 #(J/kg)
 s1 = 6703.726763985172 #(J/kg K)
 gamma_fr1 = 1.3554605754094926
 
-# State 2 - CJ 
+# State 2 - CJ
 CJ_speed = 2386.591152672143 #(m/s)
 P2 = 4270213.871314236 #(Pa)
 T2 = 3979.0578618774894 #(K)
@@ -356,8 +360,6 @@ x2 = [5.66228974e-02, 5.63248708e-02, 7.06901613e-02, 1.03138136e-01,\
 ### total enthalpy
 U2 = w2
 h2_U2 = (h2 + U2**2./2.) # SDT
-
-
 
 def func_delta_M(neu_target, M, gamma=gamma_eq2):
     part1 = ((gamma+1.)/(gamma-1.))**(1./2.)
@@ -415,8 +417,8 @@ def func_M2P(M, eps=10e-6):
 #### 1. characteristic lines -1st
 #------------------------------------------------------------------
 ### num_ch_up & num_ch_down が小さすぎても問題（num_ch_up & num_ch_down >= 7）
-num_ch_up = 7 # number of initial characteristic lines (upper side)
-num_ch_down = 7 # number of initial characteristic lines (down side)
+num_ch_up = 20 # number of initial characteristic lines (upper side)
+num_ch_down = 10 # number of initial characteristic lines (down side)
 S_add = 0.5
 
 ### i方向（横）にtheta-neu=const.確認
@@ -424,9 +426,6 @@ S_add = 0.5
 
 array_zero0 = np.zeros((int(num_ch_down),int(num_ch_up-1)))
 array_zero1 = np.zeros((int(num_ch_up + num_ch_down - 1),int(num_ch_up)))
-
-
-
 
 ### x for characteristics
 array_x_up = np.ones((int(num_ch_up))) * array_point_dw[0]
@@ -1256,9 +1255,8 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
 
 # print("/// array_lambda_o ///", array_lambda_o.shape)
 # print(array_lambda_o)
-
 graph0.func_scatter_add(array_x,array_y)
-
+graph0.func_2pi()
 graph0.func_show()
 
 
