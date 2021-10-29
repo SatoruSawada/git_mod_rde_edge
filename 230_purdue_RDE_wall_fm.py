@@ -423,8 +423,6 @@ def func_M2P(M, eps=10e-6):
     gamma = a_fr**2.*rho/P_b
     return P_b, T, R, rho, a_fr, V, gamma 
 
-
-
 #------------------------------------------------------------------
 #### 1. characteristic lines -1st
 #------------------------------------------------------------------
@@ -435,7 +433,6 @@ S_add = 0.5
 inflow_distance = 0.
 array_x_fm = np.empty(0)
 array_y_fm = np.empty(0)
-
 
 ### i方向（横）にtheta-neu=const.確認
 ### j方向（縦）にtheta+neu=const.確認
@@ -637,30 +634,30 @@ array_gamma_down = np.hstack((array_gamma_down,array_zero0))
 array_gamma = np.vstack((array_gamma,array_gamma_down))
 array_gamma = np.hstack((array_gamma, array_zero1))
 
-#============================================================================
-# del array_theta_up
-# del array_theta_down
-# del array_neu_up
-# del array_neu_down
-# del array_M_up
-# del array_M_down
-# del array_alpha_up
-# del array_alpha_down
-# del array_p_up
-# del array_p_down
-# del array_t_up
-# del array_t_down
-# del array_R_up
-# del array_R_down
-# del array_rho_up
-# del array_rho_down
-# del array_a_fr_up
-# del array_a_fr_down
-# del array_V_up
-# del array_V_down
-# del array_gamma_up
-# del array_gamma_down
-# ====
+### ============================================================================
+del array_theta_up
+del array_theta_down
+del array_neu_up
+del array_neu_down
+del array_M_up
+del array_M_down
+del array_alpha_up
+del array_alpha_down
+del array_p_up
+del array_p_down
+del array_t_up
+del array_t_down
+del array_R_up
+del array_R_down
+del array_rho_up
+del array_rho_down
+del array_a_fr_up
+del array_a_fr_down
+del array_V_up
+del array_V_down
+del array_gamma_up
+del array_gamma_down
+### ====
 
 ### あくまで特性線における値
 ### 格子点とは違うし，あくまで区別してくれ
@@ -799,31 +796,6 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
         array_V[j][i] = (array_T_o1[j][i-1]-array_p[j][i]) / array_R_o[j][i-1]
         array_rho[j][i] = (array_p[j][i]-array_T_o2[j][i-1]) / array_A_o[j][i-1]
 
-        # print("===============================================================")
-        # print("predictor")
-        # print("===============================================================")
-        # print("lambda_plus ", array_lambda_plus[j+1][i-1])
-        # print("lambda_minus", array_lambda_minus[j-1][i])
-        # print("lambda_o    ", array_lambda_o[j][i-1])
-        # print("x_4         ", array_x[j][i])
-        # print("y_4         ", array_y[j][i])
-        # print("x_3         ", array_x_3[j][i-1])
-        # print("y_3         ", array_y_3[j][i-1])
-        # print("R_o         ", array_R_o[j][i-1])
-        # print("A_o         ", array_A_o[j][i-1])
-        # print("T_o1        ", array_T_o1[j][i-1])
-        # print("T_o2        ", array_T_o2[j][i-1])
-        # print("Q_plus      ", array_Q_plus[j+1][i-1])
-        # print("S_plus      ", array_S_plus[j+1][i-1])
-        # print("T_plus      ", array_T_plus[j+1][i-1])
-        # print("Q_minus     ", array_Q_minus[j-1][i])
-        # print("S_minus     ", array_S_minus[j-1][i])
-        # print("T_minus     ", array_T_minus[j-1][i])
-        # print("p_4         ", array_p[j][i])
-        # print("theta_4     ", array_theta[j][i]/2./np.pi*360.)
-        # print("V_4         ", array_V[j][i])
-        # print("rho_4       ", array_rho[j][i])
-
         ### set predictor
         theta_3 = array_theta_3[j][i-1]
         delta_c = 1.0
@@ -915,46 +887,15 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             ### eq.(i) & (j) for calculating V4, rho4
             array_V[j][i] = (array_T_o1[j][i-1]-array_p[j][i]) / array_R_o[j][i-1]
             array_rho[j][i] = (array_p[j][i]-array_T_o2[j][i-1]) / array_A_o[j][i-1]
-
             ### delta_c
             theta_3_new = array_theta_3[j][i-1]
             delta_c = abs((theta_3-theta_3_new)/theta_3)
             theta_3 = theta_3_new
-
             ### count
-            n += 1
             gas.SPX = s_post, array_p[j][i], x_post
             array_a_fr[j][i] = soundspeed_fr(gas)
             array_M[j][i] = array_V[j][i] / array_a_fr[j][i]
             array_alpha[j][i] = np.arcsin(1./array_M[j][i])
-
-            # print("n =",n, "/// theta_3 =",theta_3*360./2./np.pi, "/// V_plus =", array_V_plus[j+1][i-1],"/// V_minus =", array_V_minus[j-1][i], \
-            #     "/// V =", array_V[j][i], "/// a =", array_a_fr[j][i])
-
-        # print("===============================================================")
-        # print("corrector")
-        # print("===============================================================")
-        # print("lambda_plus ", array_lambda_plus[j+1][i-1])
-        # print("lambda_minus", array_lambda_minus[j-1][i])
-        # print("lambda_o    ", array_lambda_o[j][i-1])
-        # print("x_4         ", array_x[j][i])
-        # print("y_4         ", array_y[j][i])
-        # print("x_3         ", array_x_3[j][i-1])
-        # print("y_3         ", array_y_3[j][i-1])
-        # print("R_o         ", array_R_o[j][i-1])
-        # print("A_o         ", array_A_o[j][i-1])
-        # print("T_o1        ", array_T_o1[j][i-1])
-        # print("T_o2        ", array_T_o2[j][i-1])
-        # print("Q_plus      ", array_Q_plus[j+1][i-1])
-        # print("S_plus      ", array_S_plus[j+1][i-1])
-        # print("T_plus      ", array_T_plus[j+1][i-1])
-        # print("Q_minus     ", array_Q_minus[j-1][i])
-        # print("S_minus     ", array_S_minus[j-1][i])
-        # print("T_minus     ", array_T_minus[j-1][i])
-        # print("p_4         ", array_p[j][i])
-        # print("theta_4     ", array_theta[j][i]/2./np.pi*360.)
-        # print("V_4         ", array_V[j][i])
-        # print("rho_4       ", array_rho[j][i])
 
         ### 更新していない値を更新していく
         gas.SPX = s_post, array_p[j][i], x_post
@@ -962,8 +903,6 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
         # array_V[j][i] = np.sqrt(2.0*(h2_U2 - gas.enthalpy_mass))
         array_M[j][i] = array_V[j][i] / array_a_fr[j][i]
         # array_rho[j][i] = gas.density
-
-
 
     ### ============================================================= standard _example 17.1_end
     ### =============================================================
@@ -992,7 +931,6 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
     ### ====== array_p_3[-1][i-1] >= P1 : direct wall reflection
     ### ====== P1 >= array_p_3[-1][i-1] >= Pcr : subsonic inflow
     ### ====== Pcr >= array_p_3[-1][i-1] : supersonic inflow
-
 
     ### =====================================================================
     ### predictor
@@ -1051,40 +989,10 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
         array_V[-1][i] = (array_T_o1[-1][i-1]-array_p[-1][i]) / array_R_o[-1][i-1]
         array_rho[-1][i] = (array_p[-1][i]-array_T_o2[-1][i-1]) / array_A_o[-1][i-1]
 
-        # print("===============================================================")
-        # print("predictor")
-        # print("===============================================================")
-        # # print("lambda_plus ", array_lambda_plus[j+1][i-1])
-        # print("lambda_minus", array_lambda_minus[-2][i])
-        # print("lambda_o    ", array_lambda_o[-1][i-1])
-        # print("x_4         ", array_x[-1][i])
-        # print("y_4         ", array_y[-1][i])
-        # print("x_3         ", array_x_3[-1][i-1])
-        # print("y_3         ", array_y_3[-1][i-1])
-        # print("R_o         ", array_R_o[-1][i-1])
-        # print("A_o         ", array_A_o[-1][i-1])
-        # print("T_o1        ", array_T_o1[-1][i-1])
-        # print("T_o2        ", array_T_o2[-1][i-1])
-        # # print("Q_plus      ", array_Q_plus[j+1][i-1])
-        # # print("S_plus      ", array_S_plus[j+1][i-1])
-        # # print("T_plus      ", array_T_plus[j+1][i-1])
-        # print("Q_minus     ", array_Q_minus[-2][i])
-        # print("S_minus     ", array_S_minus[-2][i])
-        # print("T_minus     ", array_T_minus[-2][i])
-        # print("p_3         ", array_p_3[-1][i-1])
-        # print("theta_3     ", array_theta_3[-1][i-1]/2./np.pi*360.)
-        # print("V_3         ", array_V_3[-1][i-1])
-        # print("rho_3       ", array_rho_3[-1][i-1])
-        # print("p_4         ", array_p[-1][i])
-        # print("theta_4     ", array_theta[-1][i]/2./np.pi*360.)
-        # print("V_4         ", array_V[-1][i])
-        # print("rho_4       ", array_rho[-1][i])
-
         ### set predictor (state4)
         rho_4 = array_V[-1][i]
         delta_c = 1.0
         eps_c = 10e-6
-        n = 0
 
         ### =====================================================================
         ### corrector : 全て入れなおせているのだろうか？
@@ -1143,7 +1051,6 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             array_T_o1[-1][i-1] = array_R_o[-1][i-1] * array_V_3[-1][i-1] + array_p_3[-1][i-1] # using state3
             array_T_o2[-1][i-1] = array_p_3[-1][i-1] - array_A_o[-1][i-1] * array_rho_3[-1][i-1] # using state3
 
-
             ### eq.(g) & (h) for calculating p4, theta4
             array_theta[-1][i] = angle_bottom                                               ### ================= 条件によって変更する壁面境界条件
             array_p[-1][i] = (array_T_minus[-2][i]+array_theta[-1][i]) / array_Q_minus[-2][i]
@@ -1157,52 +1064,15 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             rho_4 = rho_4_new
 
             ### count
-            n += 1
             gas.SPX = s_post, array_p[-1][i], x_post
             array_a_fr[-1][i] = soundspeed_fr(gas)
             array_M[-1][i] = array_V[-1][i] / array_a_fr[-1][i]
             array_alpha[-1][i] = np.arcsin(1./array_M[-1][i])
-            # print("n =",n, "/// theta_3 =",theta_3*360./2./np.pi, "/// V_plus =", array_V_plus[j+1][i-1],"/// V_minus =", array_V_minus[j-1][i], \
-            #     "/// V =", array_V[j][i], "/// a =", array_a_fr[j][i])
-
-            # print("n =",n)
-
-            # print("===============================================================")
-            # print("corrector")
-            # print("===============================================================")
-            # # print("lambda_plus ", array_lambda_plus[j+1][i-1])
-            # print("lambda_minus", array_lambda_minus[-2][i])
-            # print("lambda_o    ", array_lambda_o[-1][i-1])
-            # print("x_4         ", array_x[-1][i])
-            # print("y_4         ", array_y[-1][i])
-            # print("x_3         ", array_x_3[-1][i-1])
-            # print("y_3         ", array_y_3[-1][i-1])
-            # print("R_o         ", array_R_o[-1][i-1])
-            # print("A_o         ", array_A_o[-1][i-1])
-            # print("T_o1        ", array_T_o1[-1][i-1])
-            # print("T_o2        ", array_T_o2[-1][i-1])
-            # # print("Q_plus      ", array_Q_plus[j+1][i-1])
-            # # print("S_plus      ", array_S_plus[j+1][i-1])
-            # # print("T_plus      ", array_T_plus[j+1][i-1])
-            # print("Q_minus     ", array_Q_minus[-2][i])
-            # print("S_minus     ", array_S_minus[-2][i])
-            # print("T_minus     ", array_T_minus[-2][i])
-            # print("p_3         ", array_p_3[-1][i-1])
-            # print("theta_3     ", array_theta_3[-1][i-1]/2./np.pi*360.)
-            # print("V_3         ", array_V_3[-1][i-1])
-            # print("rho_3       ", array_rho_3[-1][i-1])
-            # print("p_4         ", array_p[-1][i])
-            # print("theta_4     ", array_theta[-1][i]/2./np.pi*360.)
-            # print("V_4         ", array_V[-1][i])
-            # print("rho_4       ", array_rho[-1][i])
 
         ### 更新していない値を更新していく
         gas.SPX = s_post, array_p[-1][i], x_post
         array_a_fr[-1][i] = soundspeed_fr(gas)
-        # array_V[j][i] = np.sqrt(2.0*(h2_U2 - gas.enthalpy_mass))
         array_M[-1][i] = array_V[-1][i] / array_a_fr[-1][i]
-        # array_rho[j][i] = gas.density
-
 
         ### M1=1 と仮定して計算（繰り返し計算なし）
         ### M1=1 の P2 とarray_p[-1][i] を比較
@@ -1217,6 +1087,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             judge = judge_new
             judge_new = 1
             a += 1
+            delta_y_fm = 0. ### 未燃混合気相と特性線が衝突する座標が一致するまでの繰り返し計算はなし！
 
         else:
             ################################################ あくまで判定する基準 & choking flow での計算（start）
@@ -1247,7 +1118,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             P1 = P1_b
             # P1 = P_ple * (1.+(gamma_fr_ple-1.)/2.*M1) ** (-gamma_fr_ple/(gamma_fr_ple-1.))#######################################
             Pcr = (mdot_over_A1 * (v3 - v1) - P1 + P3 / A1_over_A3) / (1./A1_over_A3 - 1.) ### P2 in an article
-            print("Pcr =", Pcr, '/// P3 =', P3, '/// i =', i, 'blocked /// a =', a)
+            # print("Pcr =", Pcr, '/// P3 =', P3, '/// i =', i, 'blocked /// a =', a)
 
             ################################################ あくまで判定する基準 & choking flow での計算（end）
             ################################################ choking flow ではこれ以上計算する必要がない
@@ -1268,24 +1139,37 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
                     P2 = (mdot_over_A1 * (v3 - v1) - P1 + P3 / A1_over_A3) / (1./A1_over_A3 - 1.) ### P2 in an article
                     delta_P1 = abs((P1-P2)/P2)
                     P1 = P2
-                angle_bottom = (array_y[-1][i] - array_y[-1][i-1]) / (array_x[-1][i] - array_x[-1][i-1])
+                angle_bottom_new = np.arctan(((inflow_distance+v3*(array_x[-1][i]-array_x[-1][i-1])/CJ_speed) - array_y[-1][i-1]) / \
+                    (array_x[-1][i] - array_x[-1][i-1]))
                 judge = judge_new
                 judge_new = 2
-                a += 1
-                print("P1 & P2 =", P1, '/// P3 =', P3, '/// i =', i, 'subsonic /// a =', a)
-
+                delta_y_fm = (array_y[-1][i]-(inflow_distance+v3*(array_x[-1][i]-array_x[-1][i-1])/CJ_speed))/array_y[-1][i]
+                print(delta_y_fm,'subsonic')
+                if abs(delta_y_fm) <= 10e-6:
+                    a += 1
+                else:
+                    angle_bottom = (angle_bottom+angle_bottom_new)/2.
+                ### 未燃混合気相と特性線が衝突する座標が一致するまでの繰り返し計算はなし！
+                # print("P1 & P2 =", P1, '/// P3 =', P3, '/// i =', i, 'subsonic /// a =', a)
 
             elif Pcr < P1: ### supersonic inflow, no further calculation
-                angle_bottom = (array_y[-1][i] - array_y[-1][i-1]) / (array_x[-1][i] - array_x[-1][i-1])
+                angle_bottom_new = np.arctan(((inflow_distance+v3*(array_x[-1][i]-array_x[-1][i-1])/CJ_speed) - array_y[-1][i-1]) / \
+                    (array_x[-1][i] - array_x[-1][i-1]))
                 judge = judge_new
                 judge_new = 3
-                a += 1
-                print("P1 & P2 =", P1, '/// P3 =', P3, '/// i =', i, 'supersonic /// a =', a)
+                delta_y_fm = (array_y[-1][i]-(inflow_distance+v3*(array_x[-1][i]-array_x[-1][i-1])/CJ_speed))/array_y[-1][i]
+                print(delta_y_fm,'supersonic')
+                if abs(delta_y_fm) <= 10e-6:
+                    a += 1
+                else:
+                    angle_bottom = (angle_bottom+angle_bottom_new)/2.
+                ### 未燃混合気相と特性線が衝突する座標が一致するまでの繰り返し計算はなし！
+                # print("P1 & P2 =", P1, '/// P3 =', P3, '/// i =', i, 'supersonic /// a =', a)
 
             else:
                 print("ERROR : inflow calculation")
 
-
+    print('===================================================================',i)
     ### inflow の進行距離計算
     inflow_distance += v3 * (array_x[-1][i] - array_x[-1][i-1]) / CJ_speed
     array_x_fm = np.hstack((array_x_fm, array_x[-1][i]))
