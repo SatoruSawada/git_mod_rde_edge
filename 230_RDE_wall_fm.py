@@ -1,5 +1,7 @@
 """
-
+20211029_sawada
+無理矢理，未燃混合気相の反射まで描いた
+未燃混合気相の内挿法・外挿法の部分はまだ詰めれていない
 """
 
 ## 意味ないけれども
@@ -427,7 +429,7 @@ def func_M2P(M, eps=10e-6):
 #### 1. characteristic lines -1st
 #------------------------------------------------------------------
 ### num_ch_up & num_ch_down が小さすぎても問題（num_ch_up & num_ch_down >= 7）
-num_ch_up = 20 # number of initial characteristic lines (upper side)
+num_ch_up = 10 # number of initial characteristic lines (upper side)
 num_ch_down = 10 # number of initial characteristic lines (down side)
 S_add = 0.5
 inflow_distance = 0.
@@ -1239,7 +1241,12 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
 
 
 
-
+np.savetxt('array_x.csv', array_x, delimiter=',')
+np.savetxt('array_y.csv', array_y, delimiter=',')
+np.savetxt('array_theta.csv', array_theta/2./np.pi*360., delimiter=',')
+np.savetxt('array_p.csv', array_p, delimiter=',')
+np.savetxt('array_lambda_plus.csv', array_lambda_plus, delimiter=',')
+np.savetxt('array_lambda_minus.csv', array_lambda_minus, delimiter=',')
 
 
 
