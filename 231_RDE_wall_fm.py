@@ -245,7 +245,7 @@ graph0.func_graph_add((0., array_point_dw[0]), (0., array_point_dw[1]), color="r
 #### 0. assumptions for fresh mixture layer
 #------------------------------------------------------------------
 ## 「detonation wave」と「fresh mixture layer」のどちらを先に描画するべきなのか分からないからとりあえず
-angle_fm = 10. / 360. * 2. * np.pi # deto_angle - np.pi/2.
+angle_fm = 9. / 360. * 2. * np.pi # deto_angle - np.pi/2.
 slope_fm = np.tan(angle_fm)
 intercept_fm = func_intercept(slope_fm, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_fm), (0., intercept_fm))
@@ -254,7 +254,7 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 #------------------------------------------------------------------
 #### 0. assumptions for slip line
 #------------------------------------------------------------------
-angle_sl = 33. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
+angle_sl = 30. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
 slope_sl = np.tan(angle_sl)
 intercept_sl = func_intercept(slope_sl, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_sl), (rde_l, intercept_sl))
@@ -432,7 +432,7 @@ def func_M2P(M, eps=10e-6):
 #------------------------------------------------------------------
 ### num_ch_up & num_ch_down が小さすぎても問題（num_ch_up & num_ch_down >= 7）
 num_ch_up = 20 # number of initial characteristic lines (upper side)
-num_ch_down = 10 # number of initial characteristic lines (down side)
+num_ch_down = 20 # number of initial characteristic lines (down side)
 S_add = 0.5
 inflow_distance = 0.
 array_x_fm = np.empty(0)
@@ -494,9 +494,11 @@ array_theta_up = np.linspace(angle_fm,angle_sl,num_ch_up)
 
 ### 流線角度：任意
 # array_theta_up = np.array([10., 10.001, 10.002, 12.5, 14., 17., 20., 24., 28., 30.])/360.*2.*np.pi
+# array_theta_up = np.array([10., 14, 18, 20, 22., 24., 26., 27., 28.5, 30.])/360.*2.*np.pi
+# array_theta_up = np.array([10., 10.001, 10.002, 10.003, 10.004, 10.005, 10.006, 10.007, 10.008, 30.])/360.*2.*np.pi
 # print("array_theta_up2 ============", array_theta_up * 360. / 2./ np.pi)
 
-array_neu_up = np.linspace(angle_fm,angle_sl,num_ch_up)
+array_neu_up = array_theta_up
 array_neu_up = array_neu_up - angle_fm
 array_M_up = np.zeros((int(num_ch_up)))
 array_alpha_up = np.zeros((int(num_ch_up)))
@@ -560,9 +562,12 @@ array_theta_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
 
 ### 流線角度：任意
 # array_theta_down = np.array([10., 9.9999999999, 9.9999999998, 9., 8., 6.5, 5., 2.5, 1., 0.])/360.*2.*np.pi
+# array_theta_down = np.array([10., 8., 6., 5., 4., 3., 2.5, 2., 1., 0.])/360.*2.*np.pi
+# array_theta_down = np.array([10., 6., 4., 3., 2.5, 2., 1.5, 1., 0.5, 0.])/360.*2.*np.pi
+# array_theta_down = np.array([10., 9.9999999999, 9.9999999998, 9.9999999997, 9.9999999996, 9.9999999995, 9.9999999994, 9.9999999993, 1., 0.])/360.*2.*np.pi
 # print("array_theta_down 2 ============", array_theta_down * 360. / 2./ np.pi)
 
-array_neu_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
+array_neu_down = array_theta_down
 array_neu_down = angle_fm - array_neu_down
 array_M_down = np.zeros((int(num_ch_down)))
 array_alpha_down = np.zeros((int(num_ch_down)))
@@ -729,9 +734,7 @@ judge_new = 1
 ### 必要になったら随時，パラメーターの行列を追加していく方針でお願いします．
 # for i in range(1,15):
 for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をしていないためにエラーが起きている
-
     # for j in range(int(num_ch_up-i), int(num_ch_up-i+1)):
-
     # for j in range(int(num_ch_up-i), int((num_ch_up+num_ch_down)-2-i)):
     for j in range(int(num_ch_up-i), int((num_ch_up+num_ch_down)-2)):
 
@@ -1031,7 +1034,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
                 array_Q_minus[-2][i] * array_p[-2][i] - array_theta[-2][i]
 
             #####################################################################################################(i)
-            
+
             ### state[-1][i-1] => state3[-1][i]
             array_x_3[-1][i-1] = array_x[-1][i-1]
             array_y_3[-1][i-1] = array_y[-1][i-1]
@@ -1126,7 +1129,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
 
             ################################################ あくまで判定する基準 & choking flow での計算（end）
             ################################################ choking flow ではこれ以上計算する必要がない
-            
+
             if Pcr >= P1: ### subsonic inflow, iteration until P1 = P2
                 M1 = 0.8
                 eps_P1 = 10e-6
