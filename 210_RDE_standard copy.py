@@ -217,7 +217,7 @@ def func_MEPC_theta3_mode2(theta1, theta2,theta4, point1, point2, point4, lambda
 rde_l = 3.0 # [-]: RDE's combustion chamber length normalized by injection fill height 
 angle_fm = 0.0 / 360. * 2. * np.pi # deto_angle - np.pi/2.
 angle_sl = 20. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
-angle_bottom = -angle_sl#-19.9 * 2. * np.pi /360.
+angle_bottom = - angle_sl  #-19.9 * 2. * np.pi /360.
 angle_dw = angle_fm + 90 / 360. * 2. * np.pi # [rad]: detonation angle from horizontal axis (theta axis)
 
 #------------------------------------------------------------------
@@ -626,9 +626,9 @@ array_T_o2 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
 
 ### 必要になったら随時，パラメーターの行列を追加していく方針でお願いします．
 # for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をしていないためにエラーが起きている
-for i in range(1,2):
+for i in range(1,6):
     # for j in range(int(num_ch_up-i), int((num_ch_up+num_ch_down)-1-i)):
-    for j in range(int(num_ch_up-i), int((num_ch_up-i+4))):
+    for j in range(int(num_ch_up-i), int((num_ch_up-i+5))):
 
         ### =====================================================================
         ### predictor
@@ -654,8 +654,8 @@ for i in range(1,2):
                 (array_x[j+1][i-1], array_y[j+1][i-1]),\
                     array_lambda_minus[j-1][i],\
                         array_lambda_plus[j+1][i-1])
-        print('============')
-        print(array_x[j][i], '///',array_y[j][i])
+        # print('============')
+        # print(array_x[j][i], '///',array_y[j][i])
         ### T+ & T- - eq17dot52_eq17dot53 (first step predictor)
         array_T_plus[j+1][i-1] = -array_S_plus[j+1][i-1] * (array_x[j][i]-array_x[j+1][i-1]) + \
             array_Q_plus[j+1][i-1] * array_p[j+1][i-1] + array_theta[j+1][i-1]
@@ -683,7 +683,7 @@ for i in range(1,2):
             array_x_3[j][i-1] = array_x[j-1][i] ### = array_x[j+1][i-1]
             eps_a = 10e-10
             delta_a = 1.0
-            print(i, "///", j)
+            # print(i, "///", j)
             while abs(delta_a) <= eps_a:
                 ### lambda_oの線分は点4を通過する
                 array_lambda_o[j][i-1] = np.tan((array_theta[j-1][i] + array_theta[j+1][i-1])/2.)
@@ -770,7 +770,7 @@ for i in range(1,2):
             array_lambda_plus[j+1][i-1] = np.tan(array_theta_plus[j+1][i-1]+array_alpha_plus[j+1][i-1]) ### 大きくなる，立上り急
             array_Q_plus[j+1][i-1] = np.sqrt(array_M_plus[j+1][i-1]**2.-1.) / (array_rho_plus[j+1][i-1]*array_V_plus[j+1][i-1]**2.)
             array_S_plus[j+1][i-1] = np.sin(array_theta_plus[j+1][i-1]) / \
-                (array_y_plus[j+1][i-1]*array_M_plus[j+1][i-1]*np.cos(array_theta_plus[j+1][i-1]+array_theta[j][i]))
+                (array_y_plus[j+1][i-1]*array_M_plus[j+1][i-1]*np.cos(array_theta_plus[j+1][i-1]+array_alpha_plus[j+1][i-1]))
             # print('===================================================================')
             # print('array_p_plus[j+1][i-1] /// ',array_p_plus[j+1][i-1])
             # print('array_theta_plus[j+1][i-1] /// ',array_theta_plus[j+1][i-1]/2./np.pi*360.)
@@ -796,7 +796,7 @@ for i in range(1,2):
             array_lambda_minus[j-1][i] = np.tan(array_theta_minus[j-1][i]-array_alpha_minus[j-1][i]) ### 大きくなる，立上り緩い
             array_Q_minus[j-1][i] = np.sqrt(array_M_minus[j-1][i]**2.-1.) / (array_rho_minus[j-1][i]*array_V_minus[j-1][i]**2.)
             array_S_minus[j-1][i] = np.sin(array_theta_minus[j-1][i]) / \
-                (array_y_minus[j-1][i]*array_M_minus[j-1][i]*np.cos(array_theta_minus[j-1][i]-array_theta[j][i]))
+                (array_y_minus[j-1][i]*array_M_minus[j-1][i]*np.cos(array_theta_minus[j-1][i]-array_alpha_minus[j-1][i]))
             # print('-------------------------------------------------------------')
             # print('array_p_minus[j-1][i] /// ',array_p_minus[j-1][i])
             # print('array_theta_minus[j-1][i] /// ',array_theta_minus[j-1][i]/2./np.pi*360.)
@@ -895,7 +895,7 @@ for i in range(1,2):
             array_a_fr[j][i] = soundspeed_fr(gas)
             array_M[j][i] = array_V[j][i]/array_a_fr[j][i]
 
-        #     print(array_x[j][i], '///',array_y[j][i], '///', delta_c)
+            print(array_x[j][i], '///',array_y[j][i], '///', delta_c)
         # print(i, '//////////////////////', j)
 
 
@@ -945,6 +945,12 @@ print(array_lambda_minus)
 
 print("/// array_lambda_o ///", array_lambda_o.shape)
 print(array_lambda_o)
+
+print("/// Q_plus ///", array_Q_plus.shape)
+print(array_Q_plus*10e6)
+
+print("/// Q_minus ///", array_Q_minus.shape)
+print(array_Q_minus*10e6)
 
 # graph0.func_scatter_add(array_x_3,array_y_3)
 graph0.func_scatter_add(array_x,array_y)
