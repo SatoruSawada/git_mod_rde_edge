@@ -936,32 +936,28 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             array_V_plus[j+1][i-1] = (array_V[j+1][i-1] + array_V[j][i]) /2.
             array_rho_plus[j+1][i-1] = (array_rho[j+1][i-1] + array_rho[j][i]) /2.
             array_y_plus[j+1][i-1] = (array_y[j+1][i-1] + array_y[j][i]) /2.
-            # gas.DP = array_rho_plus[j+1][i-1], array_p_plus[j+1][i-1] ### RDE -> gas.SPX = s2, array_p_plus[j+1][i-1], x2
             gas.SPX = s2, array_p_plus[j+1][i-1], x2
             array_a_fr_plus[j+1][i-1] = soundspeed_fr(gas)
-            # array_a_fr_plus[j+1][i-1] = np.sqrt((1.2*array_p_plus[j+1][i-1])/array_rho_plus[j+1][i-1]) ### gamma = 1.2
             array_M_plus[j+1][i-1] = array_V_plus[j+1][i-1] / array_a_fr_plus[j+1][i-1]
             array_alpha_plus[j+1][i-1] = np.arcsin(1./array_M_plus[j+1][i-1])
             array_lambda_plus[j+1][i-1] = np.tan(array_theta_plus[j+1][i-1]+array_alpha_plus[j+1][i-1])
             array_Q_plus[j+1][i-1] = np.sqrt(array_M_plus[j+1][i-1]**2.-1.) / (array_rho_plus[j+1][i-1]*array_V_plus[j+1][i-1]**2.)
             array_S_plus[j+1][i-1] = np.sin(array_theta_plus[j+1][i-1]) / \
-                (array_y_plus[j+1][i-1]*array_M_plus[j+1][i-1]*np.cos(array_theta_plus[j+1][i-1]+array_theta[j][i]))
+                (array_y_plus[j+1][i-1]*array_M_plus[j+1][i-1]*np.cos(array_theta_plus[j+1][i-1]+array_alpha_plus[j+1][i-1]))
             ### along Mach line 14 (C-)
             array_p_minus[j-1][i] = (array_p[j-1][i] + array_p[j][i]) /2.
             array_theta_minus[j-1][i] = (array_theta[j-1][i] + array_theta[j][i]) /2.
             array_V_minus[j-1][i] = (array_V[j-1][i] + array_V[j][i]) /2.
             array_rho_minus[j-1][i] = (array_rho[j-1][i] + array_rho[j][i]) /2.
             array_y_minus[j-1][i] = (array_y[j-1][i] + array_y[j][i]) /2.
-            # gas.DP = array_rho_minus[j-1][i], array_p_minus[j-1][i] ### RDE -> gas.SPX = s2, array_p_minus[j-1][i], x2
             gas.SPX = s2, array_p_minus[j-1][i], x2
             array_a_fr_minus[j-1][i] = soundspeed_fr(gas)
-            # array_a_fr_minus[j-1][i] = np.sqrt((1.2*array_p_minus[j-1][i])/array_rho_minus[j-1][i]) ### gamma = 1.2
             array_M_minus[j-1][i] = array_V_minus[j-1][i] / array_a_fr_minus[j-1][i]
             array_alpha_minus[j-1][i] = np.arcsin(1./array_M_minus[j-1][i])
             array_lambda_minus[j-1][i] = np.tan(array_theta_minus[j-1][i]-array_alpha_minus[j-1][i])
             array_Q_minus[j-1][i] = np.sqrt(array_M_minus[j-1][i]**2.-1.) / (array_rho_minus[j-1][i]*array_V_minus[j-1][i]**2.)
             array_S_minus[j-1][i] = np.sin(array_theta_minus[j-1][i]) / \
-                (array_y_minus[j-1][i]*array_M_minus[j-1][i]*np.cos(array_theta_minus[j-1][i]-array_theta[j][i]))
+                (array_y_minus[j-1][i]*array_M_minus[j-1][i]*np.cos(array_theta_minus[j-1][i]-array_alpha_minus[j-1][i]))
 
             #####################################################################################################(h)
             ### eq17dot44_eq17dot45

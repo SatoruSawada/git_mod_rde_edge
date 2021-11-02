@@ -779,7 +779,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
         ### T+ & T- - eq17dot52_eq17dot53 (first step predictor)
         array_T_plus[j+1][i-1] = -array_S_plus[j+1][i-1] * (array_x[j][i]-array_x[j+1][i-1]) + \
             array_Q_plus[j+1][i-1] * array_p[j+1][i-1] + array_theta[j+1][i-1]
-        array_T_minus[j-1][i] = -array_S_minus[j-1][i] * (array_x[j][i]-array_x[j-1][i]) + \
+        array_T_minus[j-1][i] = array_S_minus[j-1][i] * (array_x[j][i]-array_x[j-1][i]) + \
             array_Q_minus[j-1][i] * array_p[j-1][i] - array_theta[j-1][i]
 
         #####################################################################################################(e)
@@ -869,7 +869,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             ### T+ & T- - eq17dot52_eq17dot53 (first step predictor
             array_T_plus[j+1][i-1] = -array_S_plus[j+1][i-1] * (array_x[j][i]-array_x[j+1][i-1]) + \
                 array_Q_plus[j+1][i-1] * array_p[j+1][i-1] + array_theta[j+1][i-1]
-            array_T_minus[j-1][i] = -array_S_minus[j-1][i] * (array_x[j][i]-array_x[j-1][i]) + \
+            array_T_minus[j-1][i] = array_S_minus[j-1][i] * (array_x[j][i]-array_x[j-1][i]) + \
                 array_Q_minus[j-1][i] * array_p[j-1][i] - array_theta[j-1][i]
 
             #####################################################################################################(i)
@@ -983,7 +983,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
                     array_lambda_minus[-2][i], \
                         np.tan(angle_bottom))                                               ### ================= 条件によって変更する壁面境界条件
         ### T+ & T- - eq17dot52_eq17dot53 (first step predictor)
-        array_T_minus[-2][i] = -array_S_minus[-2][i] * (array_x[-1][i]-array_x[-2][i]) + \
+        array_T_minus[-2][i] = array_S_minus[-2][i] * (array_x[-1][i]-array_x[-2][i]) + \
             array_Q_minus[-2][i] * array_p[-2][i] - array_theta[-2][i]
 
         #####################################################################################################(e)
@@ -1052,7 +1052,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
                         array_lambda_minus[-2][i], \
                             np.tan(angle_bottom))                                               ### ================= 条件によって変更する壁面境界条件
             ### T+ & T- - eq17dot52_eq17dot53 (first step predictor
-            array_T_minus[-2][i] = -array_S_minus[-2][i] * (array_x[-1][i]-array_x[-2][i]) + \
+            array_T_minus[-2][i] = array_S_minus[-2][i] * (array_x[-1][i]-array_x[-2][i]) + \
                 array_Q_minus[-2][i] * array_p[-2][i] - array_theta[-2][i]
 
             #####################################################################################################(i)

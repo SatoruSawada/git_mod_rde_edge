@@ -7,9 +7,6 @@
 
 一つ目の角度の変化だけものすごく小さくする
 それ以降の角度変化は等差
-
-delta = 0 (in function S)
-
 """
 
 ## 意味ないけれども
@@ -261,7 +258,7 @@ graph0.func_graph_add((array_point_dw[0], x_cross), (array_point_dw[1], y_cross)
 #------------------------------------------------------------------
 #### 0. assumptions for slip line
 #------------------------------------------------------------------
-angle_sl = 20. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
+angle_sl = 30. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
 slope_sl = np.tan(angle_sl)
 intercept_sl = func_intercept(slope_sl, array_point_dw)
 x_cross, y_cross = func_cross((0., slope_sl), (rde_l, intercept_sl))
@@ -440,7 +437,7 @@ def func_M2P(M, eps=10e-6):
 ### num_ch_up & num_ch_down が小さすぎても問題（num_ch_up & num_ch_down >= 7）
 num_ch_up = 20 # number of initial characteristic lines (upper side)
 num_ch_down = 10 # number of initial characteristic lines (down side)
-# S_add = 0.5
+S_add = 0.5
 init_theta_delta = 10 ** (-10)
 inflow_distance = 0.
 array_x_fm = np.empty(0)
@@ -565,7 +562,6 @@ array_theta_down = np.array([angle_fm])
 array_theta_down = np.hstack((array_theta_down, np.linspace(array_theta_down_2,angle_bottom,num_ch_down-1)))
 # print('=================================down,theta')
 # print(array_theta_down/2./np.pi*360.)
-
 array_neu_down = array_theta_down
 array_neu_down = angle_fm - array_neu_down
 # print('=================================down,neu')
