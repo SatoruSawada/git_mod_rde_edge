@@ -7,6 +7,8 @@ planar mode での計算
 
 p 基準で V & rho は cantera で計算
 
+三次関数的に流線の角度を与える
+
 とりあえず上側自由境界を描画
 """
 
@@ -29,8 +31,8 @@ class CL_graph_setting:
         #### setting
         #### ==================================================================================================================
         # zoom = 0.3
-        # zoom = 2.
-        zoom = 1.
+        zoom = 2.
+        # zoom = 1.
         #### x軸
         self.x_label = 'radial direction [-]'
         self.x_min = -0.02 * zoom        #### x軸最小値
@@ -219,7 +221,7 @@ def func_MEPC_theta3(theta1, theta2, point1, point2, point4, lambda_12, eps=10e-
 rde_l = 0.06 # [-]: RDE's combustion chamber length normalized by injection fill height 
 angle_fm = 10. / 360. * 2. * np.pi # deto_angle - np.pi/2.
 angle_dw = angle_fm + 90. / 360. * 2. * np.pi # [rad]: detonation angle from horizontal axis (theta axis)
-angle_sl = 45. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
+angle_sl = 43. / 360. * 2. * np.pi ### [rad]: slip line angle from horizontal axis (theta axis)
 angle_bottom = 0. * 2. * np.pi /360.
 
 #------------------------------------------------------------------
@@ -392,7 +394,7 @@ def func_M2P(M, eps=10e-6):
 num_ch_up = 20 # number of initial characteristic lines (upper side)
 num_ch_down = 10 # number of initial characteristic lines (down side)
 # S_add = 0.1
-init_theta_delta = 10e-6
+init_theta_delta = 10e-11
 inflow_distance = 0.
 array_x_fm = np.empty(0)
 array_y_fm = np.empty(0)
@@ -450,17 +452,33 @@ del array_y_down
 # array_theta_up = np.array([10., 10.001, 10.002, 12.5, 14., 17., 20., 24., 28., 30.])/360.*2.*np.pi
 # print("array_theta_up2 ============", array_theta_up * 360. / 2./ np.pi)
 
-### 最初の偏角だけ無理矢理角度変化を小さくする（その２）
-array_theta_up_2 = angle_fm + (angle_sl-angle_fm)*init_theta_delta
-array_theta_up = np.array([angle_fm])
-array_theta_up = np.hstack((array_theta_up, np.linspace(array_theta_up_2,angle_sl,num_ch_up-1)))
-# print('=================================up,theta')
-# print(array_theta_up/2./np.pi*360.)
+# ### C0 * x ** 3. + C1
+# deg1_up = angle_fm
+# deg2_up = angle_sl
+# C1_up = deg1_up
+# C0_up = (deg2_up-C1_up)/((num_ch_up-1)**3)
+# array_sample0 = np.arange(num_ch_up)
+# array_sample_up = array_sample0
+# # print("array_sample_up ============", array_sample_up * 360. / 2./ np.pi)
+# array_sample_up = array_sample_up * array_sample_up * array_sample_up * C0_up + C1_up
+# array_theta_up = array_sample_up
+# print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
+# array_neu_up = array_sample_up - angle_fm
 
-array_neu_up = array_theta_up
-array_neu_up = array_neu_up - angle_fm
-# print('=================================up,neu')
-# print(array_neu_up/2./np.pi*360.)
+### C0 * x ** 4. + C1
+deg1_up = angle_fm
+deg2_up = angle_sl
+C1_up = deg1_up
+C0_up = (deg2_up-C1_up)/((num_ch_up-1)**4.)
+array_sample0 = np.arange(num_ch_up)
+array_sample_up = array_sample0
+# print("array_sample_up ============", array_sample_up * 360. / 2./ np.pi)
+array_sample_up = array_sample_up * array_sample_up * array_sample_up * array_sample_up * C0_up + C1_up
+array_theta_up = array_sample_up
+print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
+array_neu_up = array_sample_up - angle_fm
+
+
 
 array_M_up = np.zeros((int(num_ch_up)))
 array_alpha_up = np.zeros((int(num_ch_up)))
@@ -516,18 +534,34 @@ array_gamma = np.delete(array_gamma,-1,0)
 # array_theta_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
 # print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
 
-### 流線角度：任意
-# array_theta_down = np.array([10., 9.9999999999, 9.9999999998, 9., 8., 6.5, 5., 2.5, 1., 0.])/360.*2.*np.pi
-# print("array_theta_down 2 ============", array_theta_down * 360. / 2./ np.pi)
-array_theta_down_2 = angle_fm + (angle_bottom-angle_fm)*init_theta_delta
-array_theta_down = np.array([angle_fm])
-array_theta_down = np.hstack((array_theta_down, np.linspace(array_theta_down_2,angle_bottom,num_ch_down-1)))
-# print('=================================down,theta')
-# print(array_theta_down/2./np.pi*360.)
+# ### C0 * x ** 3. + C1
+# deg1 = angle_fm
+# deg2 = angle_bottom
+# C1 = deg1
+# C0 = (deg2-C1)/((num_ch_down-1)**3)
+# array_sample1 = np.arange(num_ch_down)
+# array_sample_down = array_sample1
+# # print("array_sample_down ============", array_sample_down * 360. / 2./ np.pi)
+# array_sample_down = array_sample_down * array_sample_down * array_sample_down * C0 + C1
+# array_theta_down = array_sample_down
+# print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
+# array_neu_down = array_sample_down
+# array_neu_down = angle_fm - array_neu_down
 
-array_neu_down = array_theta_down
+### C0 * x ** 4. + C1
+deg1 = angle_fm
+deg2 = angle_bottom
+C1 = deg1
+C0 = (deg2-C1)/((num_ch_down-1)**4.)
+array_sample1 = np.arange(num_ch_down)
+array_sample_down = array_sample1
+# print("array_sample_down ============", array_sample_down * 360. / 2./ np.pi)
+array_sample_down = array_sample_down * array_sample_down * array_sample_down * array_sample_down * C0 + C1
+array_theta_down = array_sample_down
+print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
+array_neu_down = array_sample_down
 array_neu_down = angle_fm - array_neu_down
-# print('=================================down,neu')
+
 
 array_M_down = np.zeros((int(num_ch_down)))
 array_alpha_down = np.zeros((int(num_ch_down)))
@@ -1186,18 +1220,18 @@ i2=1
 for i in range(int(num_ch_up),int(num_ch_up+3)):###20211029_sawada_とりあえず謎の妥協-2
 
     print('i =',i,'upper_ref')
-    np.savetxt('array_x.csv', array_x, delimiter=',')
-    np.savetxt('array_y.csv', array_y, delimiter=',')
-    np.savetxt('array_theta.csv', array_theta/2./np.pi*360., delimiter=',')
-    np.savetxt('array_p.csv', array_p, delimiter=',')
-    np.savetxt('array_V.csv', array_V, delimiter=',')
-    np.savetxt('array_M.csv', array_M, delimiter=',')
-    np.savetxt('array_lambda_plus.csv', array_lambda_plus, delimiter=',')
-    np.savetxt('array_lambda_minus.csv', array_lambda_minus, delimiter=',')
-    np.savetxt('array_T_plus.csv', array_T_plus, delimiter=',')
-    np.savetxt('array_Q_plus.csv', array_Q_plus, delimiter=',')
-    np.savetxt('array_T_minus.csv', array_T_minus, delimiter=',')
-    np.savetxt('array_Q_minus.csv', array_Q_minus, delimiter=',')
+    # np.savetxt('array_x.csv', array_x, delimiter=',')
+    # np.savetxt('array_y.csv', array_y, delimiter=',')
+    # np.savetxt('array_theta.csv', array_theta/2./np.pi*360., delimiter=',')
+    # np.savetxt('array_p.csv', array_p, delimiter=',')
+    # np.savetxt('array_V.csv', array_V, delimiter=',')
+    # np.savetxt('array_M.csv', array_M, delimiter=',')
+    # np.savetxt('array_lambda_plus.csv', array_lambda_plus, delimiter=',')
+    # np.savetxt('array_lambda_minus.csv', array_lambda_minus, delimiter=',')
+    # np.savetxt('array_T_plus.csv', array_T_plus, delimiter=',')
+    # np.savetxt('array_Q_plus.csv', array_Q_plus, delimiter=',')
+    # np.savetxt('array_T_minus.csv', array_T_minus, delimiter=',')
+    # np.savetxt('array_Q_minus.csv', array_Q_minus, delimiter=',')
 
 
     j = None ### 自由境界におけるj関連のエラーを回避するため
@@ -1219,20 +1253,20 @@ for i in range(int(num_ch_up),int(num_ch_up+3)):###20211029_sawada_とりあえ�
     n = 0
 
     while delta_theta_4 >= eps_theta_4:
-        np.savetxt('array_x.csv', array_x, delimiter=',')
-        np.savetxt('array_y.csv', array_y, delimiter=',')
-        np.savetxt('array_theta.csv', array_theta/2./np.pi*360., delimiter=',')
-        np.savetxt('array_p.csv', array_p, delimiter=',')
-        np.savetxt('array_V.csv', array_V, delimiter=',')
-        np.savetxt('array_M.csv', array_M, delimiter=',')
-        np.savetxt('array_lambda_plus.csv', array_lambda_plus, delimiter=',')
-        np.savetxt('array_lambda_minus.csv', array_lambda_minus, delimiter=',')
-        np.savetxt('array_T_plus.csv', array_T_plus, delimiter=',')
-        np.savetxt('array_Q_plus.csv', array_Q_plus, delimiter=',')
-        np.savetxt('array_S_plus.csv', array_S_plus, delimiter=',')
-        np.savetxt('array_T_minus.csv', array_T_minus, delimiter=',')
-        np.savetxt('array_Q_minus.csv', array_Q_minus, delimiter=',')
-        np.savetxt('array_S_minus.csv', array_S_minus, delimiter=',')
+        # np.savetxt('array_x.csv', array_x, delimiter=',')
+        # np.savetxt('array_y.csv', array_y, delimiter=',')
+        # np.savetxt('array_theta.csv', array_theta/2./np.pi*360., delimiter=',')
+        # np.savetxt('array_p.csv', array_p, delimiter=',')
+        # np.savetxt('array_V.csv', array_V, delimiter=',')
+        # np.savetxt('array_M.csv', array_M, delimiter=',')
+        # np.savetxt('array_lambda_plus.csv', array_lambda_plus, delimiter=',')
+        # np.savetxt('array_lambda_minus.csv', array_lambda_minus, delimiter=',')
+        # np.savetxt('array_T_plus.csv', array_T_plus, delimiter=',')
+        # np.savetxt('array_Q_plus.csv', array_Q_plus, delimiter=',')
+        # np.savetxt('array_S_plus.csv', array_S_plus, delimiter=',')
+        # np.savetxt('array_T_minus.csv', array_T_minus, delimiter=',')
+        # np.savetxt('array_Q_minus.csv', array_Q_minus, delimiter=',')
+        # np.savetxt('array_S_minus.csv', array_S_minus, delimiter=',')
 
         #####################################################################################################(c)
         ### lambda_plus & lambda_minus - eq17dot47_eq17dot48 (first step predictor)
@@ -1321,40 +1355,6 @@ for i in range(int(num_ch_up),int(num_ch_up+3)):###20211029_sawada_とりあえ�
     array_A_o[0][i-1] = array_a_fr_3[0][i-1] ** 2.
     array_T_o1[0][i-1] = array_R_o[0][i-1] * array_V_3[0][i-1] + array_p_3[0][i-1] # using state3
     array_T_o2[0][i-1] = array_p_3[0][i-1] - array_A_o[0][i-1] * array_rho_3[0][i-1] # using state3
-
-
-    ### 計算していないところ
-    # array_lambda_minus[0][i] = 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1511,20 +1511,7 @@ for i in range(int(num_ch_up),int(num_ch_up+3)):###20211029_sawada_とりあえ�
             ### eq17dot43_eq17dot46
             ### (theta3, theta4) -> corrector
             array_lambda_o[j][i-1] = np.tan((array_theta_3[j][i-1]+array_theta[j][i])/2.)
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+          
             
             # print('20211029_sawada_problem',j)
 

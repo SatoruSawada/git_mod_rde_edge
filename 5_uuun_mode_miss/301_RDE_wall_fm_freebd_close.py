@@ -29,8 +29,8 @@ class CL_graph_setting:
         #### setting
         #### ==================================================================================================================
         # zoom = 0.3
-        # zoom = 2.
-        zoom = 1.
+        zoom = 2.
+        # zoom = 1.
         #### x軸
         self.x_label = 'radial direction [-]'
         self.x_min = -0.02 * zoom        #### x軸最小値
@@ -237,7 +237,7 @@ graph0.func_rde_exit(rde_l)
 #------------------------------------------------------------------
 ## deto波と燃焼室底面の接点はどの条件であろうと不変である -> 原点 （本番でもこのつもり）
 ## この計算では「deto_height」固定
-height_dw = 0.01 # [-]: injection fill height normalized by deto_height (z axis)
+height_dw = 0.02 # [-]: injection fill height normalized by deto_height (z axis)
 ## deto波描画
 ## そういえばatanの値域って -np.pi/2. ~ +np.pi/2. だったっけか 
 array_point_dw = (height_dw*np.tan(-(angle_dw-np.pi/2.)), height_dw)
@@ -390,8 +390,9 @@ def func_M2P(M, eps=10e-6):
 #------------------------------------------------------------------
 ### num_ch_up & num_ch_down が小さすぎても問題（num_ch_up & num_ch_down >= 7）
 num_ch_up = 20 # number of initial characteristic lines (upper side)
-num_ch_down = 10 # number of initial characteristic lines (down side)
-S_add = 0.1
+num_ch_down = 20 # number of initial characteristic lines (down side)
+# S_add = 0.1
+init_theta_delta = 10e-11
 inflow_distance = 0.
 array_x_fm = np.empty(0)
 array_y_fm = np.empty(0)
@@ -442,15 +443,25 @@ del array_y_down
 ### neu, M, alpha
 
 ### 流線角度：等差
-array_theta_up = np.linspace(angle_fm,angle_sl,num_ch_up)
-print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
+# array_theta_up = np.linspace(angle_fm,angle_sl,num_ch_up)
+# print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
 
 ### 流線角度：任意
 # array_theta_up = np.array([10., 10.001, 10.002, 12.5, 14., 17., 20., 24., 28., 30.])/360.*2.*np.pi
 # print("array_theta_up2 ============", array_theta_up * 360. / 2./ np.pi)
 
-array_neu_up = np.linspace(angle_fm,angle_sl,num_ch_up)
+### 最初の偏角だけ無理矢理角度変化を小さくする（その２）
+array_theta_up_2 = angle_fm + (angle_sl-angle_fm)*init_theta_delta
+array_theta_up = np.array([angle_fm])
+array_theta_up = np.hstack((array_theta_up, np.linspace(array_theta_up_2,angle_sl,num_ch_up-1)))
+# print('=================================up,theta')
+# print(array_theta_up/2./np.pi*360.)
+
+array_neu_up = array_theta_up
 array_neu_up = array_neu_up - angle_fm
+# print('=================================up,neu')
+# print(array_neu_up/2./np.pi*360.)
+
 array_M_up = np.zeros((int(num_ch_up)))
 array_alpha_up = np.zeros((int(num_ch_up)))
 array_p_up = np.zeros((int(num_ch_up)))
@@ -502,15 +513,22 @@ array_gamma = np.delete(array_gamma,-1,0)
 
 #============================================================================
 ### 流線角度：等差
-array_theta_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
-print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
+# array_theta_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
+# print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
 
 ### 流線角度：任意
 # array_theta_down = np.array([10., 9.9999999999, 9.9999999998, 9., 8., 6.5, 5., 2.5, 1., 0.])/360.*2.*np.pi
 # print("array_theta_down 2 ============", array_theta_down * 360. / 2./ np.pi)
+array_theta_down_2 = angle_fm + (angle_bottom-angle_fm)*init_theta_delta
+array_theta_down = np.array([angle_fm])
+array_theta_down = np.hstack((array_theta_down, np.linspace(array_theta_down_2,angle_bottom,num_ch_down-1)))
+# print('=================================down,theta')
+# print(array_theta_down/2./np.pi*360.)
 
-array_neu_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
+array_neu_down = array_theta_down
 array_neu_down = angle_fm - array_neu_down
+# print('=================================down,neu')
+
 array_M_down = np.zeros((int(num_ch_down)))
 array_alpha_down = np.zeros((int(num_ch_down)))
 array_p_down = np.zeros((int(num_ch_down)))
@@ -678,7 +696,6 @@ judge_new = 1
 for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をしていないためにエラーが起きている
 
     # for j in range(int(num_ch_up-i), int(num_ch_up-i+1)):
-
     # for j in range(int(num_ch_up-i), int((num_ch_up+num_ch_down)-2-i)):
     for j in range(int(num_ch_up-i), int((num_ch_up+num_ch_down)-2)):
 
@@ -1306,40 +1323,6 @@ for i in range(int(num_ch_up),int(num_ch_up+3)):###20211029_sawada_とりあえ�
     array_T_o2[0][i-1] = array_p_3[0][i-1] - array_A_o[0][i-1] * array_rho_3[0][i-1] # using state3
 
 
-    ### 計算していないところ
-    # array_lambda_minus[0][i] = 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1558,7 +1541,7 @@ for i in range(int(num_ch_up),int(num_ch_up+3)):###20211029_sawada_とりあえ�
             array_a_fr[j][i] = soundspeed_fr(gas)
             array_M[j][i] = array_V[j][i] / array_a_fr[j][i]
             array_alpha[j][i] = np.arcsin(1./array_M[j][i])
-            print('n=====', n, 'p=====',array_p[j][i])
+            # print('n=====', n, 'p=====',array_p[j][i])
             n += 1
 
         ### 更新していない値を更新していく
