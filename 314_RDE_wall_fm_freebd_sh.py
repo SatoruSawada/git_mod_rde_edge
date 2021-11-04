@@ -406,19 +406,21 @@ del array_y_down
 # array_theta_up = np.linspace(angle_fm,angle_sl,num_ch_up)
 # print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
 
-### C0 * x ** 4. + C1
-deg1_up = angle_fm
-deg2_up = angle_sl
-C1_up = deg1_up
-C0_up = (deg2_up-C1_up)/((num_ch_up-1)**4.)
-array_sample0 = np.arange(num_ch_up)
-array_sample_up = array_sample0
-# print("array_sample_up ============", array_sample_up * 360. / 2./ np.pi)
-array_sample_up = array_sample_up * array_sample_up * array_sample_up * array_sample_up * C0_up + C1_up
-array_theta_up = array_sample_up
-# print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
-array_neu_up = array_sample_up - angle_fm
+array_sample_up = np.linspace(0,360,int(num_ch_up))
+C1 = 1.  ### Cy に対して
+C2 = 0.7  
+Cx = 1.9    ### rad以外 可変
+Cy = np.pi ### rad Cx に対して
+array_sample_up = (C1*np.arctan(C2*array_sample_up/360.*2.*np.pi-Cx) + Cy)# / 2. / np.pi * 360.
+### (0 ~ 360) ==>> (angle_fm ~ angle_sl)
+Ca = (angle_fm- angle_sl) / (array_sample_up[0]-array_sample_up[-1])
+Cb = angle_fm - Ca * array_sample_up[0]
+array_sample_up = Ca * array_sample_up + Cb
 
+
+array_theta_up = array_sample_up
+print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
+array_neu_up = array_sample_up - angle_fm
 array_M_up = np.zeros((int(num_ch_up)))
 array_alpha_up = np.zeros((int(num_ch_up)))
 array_p_up = np.zeros((int(num_ch_up)))
@@ -471,17 +473,21 @@ array_gamma = np.delete(array_gamma,-1,0)
 # array_theta_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
 # print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
 
-### C0 * x ** 4. + C1
-deg1 = angle_fm
-deg2 = angle_bottom
-C1 = deg1
-C0 = (deg2-C1)/((num_ch_down-1)**4.)
-array_sample1 = np.arange(num_ch_down)
-array_sample_down = array_sample1
-# print("array_sample_down ============", array_sample_down * 360. / 2./ np.pi)
-array_sample_down = array_sample_down * array_sample_down * array_sample_down * array_sample_down * C0 + C1
+array_sample_down = np.linspace(0,360,int(num_ch_down))
+# C1 = 1.  ### Cy に対して
+# C2 = 0.7  
+# Cx = 2.    ### rad以外 可変
+# Cy = np.pi ### rad Cx に対して
+array_sample_down = (C1*np.arctan(C2*array_sample_down/360.*2.*np.pi-Cx) + Cy)# / 2. / np.pi * 360.
+### (0 ~ 360) ==>> (angle_fm ~ angle_sl)
+Ca = (angle_fm- angle_bottom) / (array_sample_down[0]-array_sample_down[-1])
+Cb = angle_fm - Ca * array_sample_down[0]
+array_sample_down = Ca * array_sample_down + Cb
+
+
+
 array_theta_down = array_sample_down
-# print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
+print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
 array_neu_down = array_sample_down
 array_neu_down = angle_fm - array_neu_down
 
