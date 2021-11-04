@@ -410,7 +410,6 @@ array_sample_up = np.linspace(angle_fm,angle_sl,num_ch_up)
 # deg1_up = angle_fm
 # deg2_up = angle_sl
 # C1_up = deg1_up
-<<<<<<< HEAD:312_RDE_wall_fm_freebd_sh.py
 # C0_up = (deg2_up-C1_up)/((num_ch_up-1)**(1))
 # array_sample0 = np.arange(num_ch_up)
 # array_sample_up = array_sample0
@@ -427,7 +426,6 @@ print("array_sample_up ============", array_sample_up * 360. / 2./ np.pi)
 
 
 
-=======
 # C0_up = (deg2_up-C1_up)/((num_ch_up-1)**4.)
 # array_sample0 = np.arange(num_ch_up)
 # array_sample_up = array_sample0
@@ -436,7 +434,6 @@ print("array_sample_up ============", array_sample_up * 360. / 2./ np.pi)
 
 
 array_theta_up = array_sample_up
->>>>>>> bc97ec17c53014442179da15011e8dda790b189a:313_RDE_wall_fm_freebd_sh.py
 # print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
 array_theta_up = array_sample_up
 array_neu_up = array_sample_up - angle_fm
@@ -496,7 +493,6 @@ array_sample_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
 # deg1 = angle_fm
 # deg2 = angle_bottom
 # C1 = deg1
-<<<<<<< HEAD:312_RDE_wall_fm_freebd_sh.py
 # C0 = (deg2-C1)/((num_ch_down-1)**(1))
 # array_sample1 = np.arange(num_ch_down)
 # array_sample_down = array_sample1
@@ -517,7 +513,6 @@ print("array_sample_down ============", array_sample_down * 360. / 2./ np.pi)
 array_theta_down = array_sample_down
 array_neu_down = angle_fm - array_sample_down
 
-=======
 # C0 = (deg2-C1)/((num_ch_down-1)**4.)
 # array_sample1 = np.arange(num_ch_down)
 # array_sample_down = array_sample1
@@ -529,7 +524,6 @@ array_theta_down = array_sample_down
 # print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
 array_neu_down = array_sample_down
 array_neu_down = angle_fm - array_neu_down
->>>>>>> bc97ec17c53014442179da15011e8dda790b189a:313_RDE_wall_fm_freebd_sh.py
 array_M_down = np.zeros((int(num_ch_down)))
 array_alpha_down = np.zeros((int(num_ch_down)))
 array_p_down = np.zeros((int(num_ch_down)))

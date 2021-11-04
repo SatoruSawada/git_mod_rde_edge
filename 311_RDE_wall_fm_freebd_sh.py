@@ -404,8 +404,8 @@ def func_M2P(M, eps=10e-6):
 #### 1. characteristic lines -1st
 #------------------------------------------------------------------
 ### num_ch_up & num_ch_down が小さすぎても問題（num_ch_up & num_ch_down >= 7）
-num_ch_up = 20 # number of initial characteristic lines (upper side)
-num_ch_down = 10 # number of initial characteristic lines (down side)
+num_ch_up = 30 # number of initial characteristic lines (upper side)
+num_ch_down = 20 # number of initial characteristic lines (down side)
 # S_add = 0.1
 init_theta_delta = 10e-11
 inflow_distance = 0.
@@ -1224,7 +1224,7 @@ for i in range(int(num_ch_up),int(2*num_ch_up-2)):###20211029_sawada_とりあ�
         array_V_3[0][i-1] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
         #####################################################################################################(f)
         ### delta_theta_4
-        array_p[0][i] = array_p[0][i-1] * (1.- 0.007*(i2-1)) ####==========================================================================================================================================
+        array_p[0][i] = array_p[0][i-1] * (1.- 0.06*((i2)**(3./10.))) ####==========================================================================================================================================
         gas.SPX = s_post, array_p[0][i], x_post
         array_rho[0][i] = gas.density_mass #array_rho[0][i-1]
         array_V[0][i] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass)) #array_V[0][i-1]
