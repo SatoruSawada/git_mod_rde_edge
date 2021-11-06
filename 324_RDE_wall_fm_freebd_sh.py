@@ -13,6 +13,9 @@ p 基準で V & rho は cantera で計算
 
 ともかともかともかともかともかともか
 
+二周目底面反射
+
+仮で x = 0.45 でデトネーション波
 """
 
 ## 意味ないけれども
@@ -31,7 +34,7 @@ class CL_graph_setting:
         #### setting
         #### ==================================================================================================================
         # zoom = 0.6
-        zoom = 2.
+        zoom = 4.
         # zoom = 1.
         #### x軸
         self.x_label = 'radial direction [-]'
@@ -366,6 +369,7 @@ num_ch_down = 10 # number of initial characteristic lines (down side)
 inflow_distance = 0.
 array_x_fm = np.empty(0)
 array_y_fm = np.empty(0)
+array_theta_fm = np.empty(0)
 array_x_sl = np.empty(0)
 array_y_sl = np.empty(0)
 array_zero0 = np.zeros((int(num_ch_down),int(num_ch_up-1)))
@@ -1060,6 +1064,7 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
     inflow_distance += v3 * (array_x[-1][i] - array_x[-1][i-1]) / CJ_speed
     array_x_fm = np.hstack((array_x_fm, array_x[-1][i]))
     array_y_fm = np.hstack((array_y_fm, inflow_distance))
+    array_theta_fm = np.hstack((array_theta_fm, array_theta[-1][i]))
 
 ### ============================================================= wall_reflection and injection judge _example 17.2_end
 ### =============================================================
@@ -1157,7 +1162,7 @@ for i in range(int(num_ch_up),int(2*num_ch_up-2)):###20211029_sawada_とりあ�
     print('p =', array_p[0][i], '/// T_plus =',array_T_plus[1][i-1], '/// Q_plus =',array_Q_plus[1][i-1], '/// theta =', array_theta[0][i] /2./np.pi*360.)
 
     # for j in range(1, 10):
-    for j in range(1, int((num_ch_up+num_ch_down)-2-i2)):
+    for j in range(1, int((num_ch_up+num_ch_down)-2)):
         ### =====================================================================
         ### predictor
         ### =====================================================================
@@ -1314,7 +1319,271 @@ for i in range(int(num_ch_up),int(2*num_ch_up-2)):###20211029_sawada_とりあ�
             array_alpha[j][i] = np.arcsin(1./array_M[j][i])
             n += 1
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ### =====================================================================
+    ### predictor
+    ### =====================================================================
+    
+    ### j のエラー検出のため
+    ### j = int((num_ch_up+num_ch_down)-1
+    j = None
+    a = 0
+    while judge != judge_new or a == 0:
+        #####################################################################################################(c)
+        ### lambda_plus & lambda_minus - eq17dot47_eq17dot48 (first step predictor)
+        array_lambda_minus[-2][i] = np.tan(array_theta[-2][i]-array_alpha[-2][i])
+        ### Q+ & Q- - eq17dot54_eq17dot55 (first step predictor) (noting delta is removed)
+        array_Q_minus[-2][i] = np.sqrt((array_M[-2][i])**2.-1.) / (array_rho[-2][i]*array_V[-2][i]**2.)
+        #####################################################################################################(d)
+        # ### eq17dot44_eq17dot45
+        ### eq17dot44_eq17dot45--------------------------------------------------------------------------------------------------------------------変更（for wall）
+        array_x[-1][i], array_y[-1][i] = func_cross_gas_dynamics(\
+            (array_x[-2][i], array_y[-2][i]),\
+                (array_x[-1][i-1], array_y[-1][i-1]),\
+                    array_lambda_minus[-2][i], \
+                        np.tan(angle_bottom))           ### ================= 条件によって変更する壁面境界条件
+        ### T+ & T- - eq17dot52_eq17dot53 (first step predictor)
+        array_T_minus[-2][i] = -array_S_minus[-2][i] * (array_x[-1][i]-array_x[-2][i]) + \
+            array_Q_minus[-2][i] * array_p[-2][i] - array_theta[-2][i]
+        #####################################################################################################(e)
+        ### eq17dot49 (the modified euler predictor-corrector)
+        ### eq17dot43_eq17dot46
+        ### state[-1][i-1] => state3[-1][i]
+        array_x_3[-1][i-1] = array_x[-1][i-1]
+        array_y_3[-1][i-1] = array_y[-1][i-1]
+        array_theta_3[-1][i-1] = array_theta[-1][i-1]
+        array_lambda_o[-1][i-1] = array_lambda_o[-1][i-1]
+        array_p_3[-1][i-1] = array_p[-1][i-1]
+        array_rho_3[-1][i-1] = array_rho[-1][i-1]
+        array_V_3[-1][i-1] = array_V[-1][i-1]
+        #####################################################################################################(f)
+        gas.SPX = s_post, array_p_3[-1][i-1], x_post
+        array_a_fr_3[-1][i-1] = soundspeed_fr(gas)
+        ### eq.(g) & (h) for calculating p4, theta4
+        array_theta[-1][i] = angle_bottom
+        array_p[-1][i] = (array_T_minus[-2][i]+array_theta[-1][i]) / array_Q_minus[-2][i] ###-------------（変更）
+        ### eq.(i) & (j) for calculating V4, rho4
+        gas.SPX = s_post, array_p[-1][i], x_post
+        array_V[-1][i] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
+        array_rho[-1][i] = gas.density_mass
+        ### set predictor (state4)
+        p_4 = array_p[-1][i]
+        delta_c = 1.0
+        eps_c = 10e-6
+
+        ### =====================================================================
+        ### corrector : 全て入れなおせているのだろうか？
+        ### =====================================================================
+        while delta_c >= eps_c:
+            #####################################################################################################(g)
+            ### along Mach line 24 (C+)
+            ### along Mach line 14 (C-)
+            array_p_minus[-2][i] = (array_p[-2][i] + array_p[-1][i]) /2.
+            array_theta_minus[-2][i] = (array_theta[-2][i] + array_theta[-1][i]) /2.
+            gas.SPX = s_post, array_p_minus[-2][i], x_post
+            array_V_minus[-2][i] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
+            array_rho_minus[-2][i] = gas.density_mass
+            array_y_minus[-2][i] = (array_y[-2][i] + array_y[-1][i]) /2.
+            array_a_fr_minus[-2][i] = soundspeed_fr(gas)
+            array_M_minus[-2][i] = array_V_minus[-2][i] / array_a_fr_minus[-2][i]
+            array_alpha_minus[-2][i] = np.arcsin(1./array_M_minus[-2][i])
+            array_lambda_minus[-2][i] = np.tan(array_theta_minus[-2][i]-array_alpha_minus[-2][i])
+            array_Q_minus[-2][i] = np.sqrt(array_M_minus[-2][i]**2.-1.) / (array_rho_minus[-2][i]*array_V_minus[-2][i]**2.)
+            #####################################################################################################(h)
+            ### eq17dot44_eq17dot45-------------------------------------------------------------------変更（for wall）
+            array_x[-1][i], array_y[-1][i] = func_cross_gas_dynamics(\
+                (array_x[-2][i], array_y[-2][i]),\
+                    (array_x[-1][i-1], array_y[-1][i-1]),\
+                        array_lambda_minus[-2][i], \
+                            np.tan(angle_bottom))
+            ### T+ & T- - eq17dot52_eq17dot53 (first step predictor
+            array_T_minus[-2][i] = -array_S_minus[-2][i] * (array_x[-1][i]-array_x[-2][i]) + \
+                array_Q_minus[-2][i] * array_p[-2][i] - array_theta[-2][i]
+            #####################################################################################################(i)
+            ### state[-1][i-1] => state3[-1][i]
+            array_x_3[-1][i-1] = array_x[-1][i-1]
+            array_y_3[-1][i-1] = array_y[-1][i-1]
+            array_theta_3[-1][i-1] = array_theta[-1][i-1]
+            array_lambda_o[-1][i-1] = array_lambda_o[-1][i-1]
+            array_p_3[-1][i-1] = array_p[-1][i-1]
+            array_rho_3[-1][i-1] = array_rho[-1][i-1]
+            array_V_3[-1][i-1] = array_V[-1][i-1]
+            #####################################################################################################(j)
+            ### (start) ここで計算が「predictor」と「corrector」で異なる
+            array_p_o[-1][i-1] = (array_p_3[-1][i-1] + array_p[-1][i]) / 2.
+            gas.SPX = s_post, array_p_o[-1][i-1], x_post
+            array_rho_o[-1][i-1] = gas.density_mass
+            array_V_o[-1][i-1] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
+            ### (end) 
+            array_a_fr_3[-1][i-1] = soundspeed_fr(gas)
+            ### eq.(g) & (h) for calculating p4, theta4
+            array_theta[-1][i] = angle_bottom                    ### ================= 条件によって変更する壁面境界条件
+            array_p[-1][i] = (array_T_minus[-2][i]+array_theta[-1][i]) / array_Q_minus[-2][i]
+            ### eq.(i) & (j) for calculating V4, rho4
+            gas.SPX = s_post, array_p[-1][i], x_post
+            array_rho[-1][i] = gas.density_mass
+            array_V[-1][i] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
+            array_a_fr[-1][i] = soundspeed_fr(gas)
+            array_M[-1][i] = array_V[-1][i] / array_a_fr[-1][i]
+            array_alpha[-1][i] = np.arcsin(1./array_M[-1][i])
+            ### delta_c
+            p_4_new = array_p[-1][i]
+            delta_c = abs((p_4-p_4_new)/p_4)
+            p_4 = p_4_new
+        ### M1=1 と仮定して計算（繰り返し計算なし）
+        ### M1=1 の P2 とarray_p[-1][i] を比較
+        ###### (i)  choked inflow -> no further calculation
+        ###### (ii) unchoked inflow -> iteration until P1 = P2
+        A1_over_A3 = 0.2
+        P3 = array_p[-1][i] ### point 4
+        ### 現在の列の底面の要素
+        if P3 >= P_ple: ### no inflow
+            # angle_bottom = angle_bottom ### stay
+            v3 = 0.
+            judge = judge_new
+            judge_new = 1
+            a += 1
+            delta_y_fm = 0. ### 未燃混合気相と特性線が衝突する座標が一致するまでの繰り返し計算はなし！
+        else:
+            ################################################ あくまで判定する基準 & choking flow での計算（start）
+            def func_kainokoushiki(a, b, c):
+                return (-b+np.sqrt(b**2.-4.*a*c))/2.*a
+            ### M1 = 1 になるまでsecant method ???
+            M1 = 1.
+            def func_delta_P1_sonic(P1, M1=1.):
+                mdot_over_A1 = P_ple / np.sqrt(T_ple) * np.sqrt(gamma_fr_ple/R_ple) * M1 * \
+                    (1.+(gamma_fr_ple-1.)/2.*M1**2.)**(-(gamma_fr_ple+1.)/(2.*(gamma_fr_ple-1.)))
+                v3 = func_kainokoushiki(1./2., gamma_fr_ple/(gamma_fr_ple-1.)*P3/(A1_over_A3*mdot_over_A1), -gamma_fr_ple/(gamma_fr_ple-1.)*P_ple*rho_ple)
+                gas.SPX = s_ple, P1, q
+                v1 = np.sqrt(2.0*(h_ple - gas.enthalpy_mass))
+                a_fr_1 = soundspeed_fr(gas)
+                delta_M1 = (M1-v1/a_fr_1)
+                return delta_M1, v3, v1, a_fr_1,mdot_over_A1
+            P1_a = 101300*1.2
+            P1_b = 101300*1.4
+            eps_P1 = 10e-6
+            dP1_a,v3,v1,a_fr_1,mdot_over_A1 = func_delta_P1_sonic(P1_a)
+            dP1_b,v3,v1,a_fr_1,mdot_over_A1 = func_delta_P1_sonic(P1_b)
+            while abs(dP1_b) > eps_P1:
+                P1_s = (P1_a * dP1_b - P1_b * dP1_a)/(dP1_b - dP1_a)
+                P1_a, P1_b = P1_b, P1_s
+                dP1_a = dP1_b
+                dP1_b,v3,v1,a_fr_1,mdot_over_A1 = func_delta_P1_sonic(P1_b)
+            P1 = P1_b
+            # P1 = P_ple * (1.+(gamma_fr_ple-1.)/2.*M1) ** (-gamma_fr_ple/(gamma_fr_ple-1.))#######################################
+            Pcr = (mdot_over_A1 * (v3 - v1) - P1 + P3 / A1_over_A3) / (1./A1_over_A3 - 1.) ### P2 in an article
+            # print("Pcr =", Pcr, '/// P3 =', P3, '/// i =', i, 'blocked /// a =', a)
+            ################################################ あくまで判定する基準 & choking flow での計算（end）
+            ################################################ choking flow ではこれ以上計算する必要がない
+            if Pcr >= P1: ### subsonic inflow, iteration until P1 = P2
+                print('subsonic')
+                M1 = 0.8
+                eps_P1 = 10e-6
+                delta_P1 = 1.0
+                while delta_P1 >= eps_P1:
+                    # P1 = P_ple * (1.+(gamma_fr_ple-1.)/2.*M1) ** (-gamma_fr_ple/(gamma_fr_ple-1.)) ##################################
+                    mdot_over_A1 = P_ple / np.sqrt(T_ple) * np.sqrt(gamma_fr_ple/R_ple) * M1 * \
+                        (1.+(gamma_fr_ple-1.)/2.*M1**2.)**(-(gamma_fr_ple+1.)/(2.*(gamma_fr_ple-1.)))
+                    v3 = func_kainokoushiki(1./2., gamma_fr_ple/(gamma_fr_ple-1.)*P3/(A1_over_A3*mdot_over_A1), -gamma_fr_ple/(gamma_fr_ple-1.)*P_ple*rho_ple)
+                    gas.SPX = s_ple, P1, q
+                    v1 = np.sqrt(2.0*(h_ple - gas.enthalpy_mass))                    
+                    a_fr_1 = soundspeed_fr(gas)
+                    M1 = v1 / a_fr_1
+                    P2 = (mdot_over_A1 * (v3 - v1) - P1 + P3 / A1_over_A3) / (1./A1_over_A3 - 1.) ### P2 in an article
+                    delta_P1 = abs((P1-P2)/P2)
+                    P1 = P2
+                angle_bottom_new = np.arctan(((inflow_distance+v3*(array_x[-1][i]-array_x[-1][i-1])/CJ_speed) - array_y[-1][i-1]) / \
+                    (array_x[-1][i] - array_x[-1][i-1]))
+                judge = judge_new
+                judge_new = 2
+                delta_y_fm = (array_y[-1][i]-(inflow_distance+v3*(array_x[-1][i]-array_x[-1][i-1])/CJ_speed))/array_y[-1][i]
+                # print(delta_y_fm,'subsonic')
+                if abs(delta_y_fm) <= 10e-6:
+                    a += 1
+                else:
+                    angle_bottom = (angle_bottom+angle_bottom_new)/2.
+                ### 未燃混合気相と特性線が衝突する座標が一致するまでの繰り返し計算はなし！
+                # print("P1 & P2 =", P1, '/// P3 =', P3, '/// i =', i, 'subsonic /// a =', a)
+            elif Pcr < P1: ### supersonic inflow, no further calculation
+                print('supersonic')
+                angle_bottom_new = np.arctan(((inflow_distance+v3*(array_x[-1][i]-array_x[-1][i-1])/CJ_speed) - array_y[-1][i-1]) / \
+                    (array_x[-1][i] - array_x[-1][i-1]))
+                judge = judge_new
+                judge_new = 3
+                delta_y_fm = (array_y[-1][i]-(inflow_distance+v3*(array_x[-1][i]-array_x[-1][i-1])/CJ_speed))/array_y[-1][i]
+                # print(delta_y_fm,'supersonic')
+                if abs(delta_y_fm) <= 10e-6:
+                    a += 1
+                else:
+                    angle_bottom = (angle_bottom+angle_bottom_new)/2.
+                ### 未燃混合気相と特性線が衝突する座標が一致するまでの繰り返し計算はなし！
+                # print("P1 & P2 =", P1, '/// P3 =', P3, '/// i =', i, 'supersonic /// a =', a)
+            else:
+                print("ERROR : inflow calculation")
+    print('===================================================================',i)
+    ### inflow の進行距離計算
+    inflow_distance += v3 * (array_x[-1][i] - array_x[-1][i-1]) / CJ_speed
+    array_x_fm = np.hstack((array_x_fm, array_x[-1][i]))
+    array_y_fm = np.hstack((array_y_fm, inflow_distance))
+    array_theta_fm = np.hstack((array_theta_fm, array_theta[-1][i]))
     i2 += 1
+
+
+
+
+
+### ============================================================= 滑り面＆底面の間の特性線_start
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### =============================================================
+### ============================================================= 滑り面＆底面の間の特性線_end
+from scipy import interpolate
+### 滑り面：
+# func_fm_x_y = interpolate.PchipInterpolator(array_x_fm, array_y_fm)
+# func_fm_x_theta = interpolate.PchipInterpolator(array_x_fm, array_theta_fm)
+
+### 底面：
+
+
+np.savetxt('array_x_fm.csv', array_x_fm)
+np.savetxt('array_y_fm.csv', array_y_fm)
+np.savetxt('array_theta_fm.csv', array_theta_fm)
+
+
+
+
+
+
 
 
 
@@ -1350,6 +1619,8 @@ for i in range(int(num_ch_up),int(2*num_ch_up-2)):###20211029_sawada_とりあ�
 ### ============================================================= region between oblique shock and selip wall _example 17.5_start
 
 
+### 二周目の滑り面の作成
+### 仮で x = 0.45 にデトネーション波
 
 
 
