@@ -5,6 +5,8 @@
 2. 特性線追加
 3. 下からの特性線が上側境界条件に到達するまでの計算
 
+追加の特性線の状態量・座標をすべて内挿法
+（本来であればしっかりと計算しないといけないところでは？）
 """
 
 ## 意味ないけれども
@@ -362,6 +364,7 @@ def func_M2P(M, eps=10e-10):
 ### j方向（縦）にtheta+neu=const.確認
 num_ch_up = 20 # number of initial characteristic lines (upper side)
 num_ch_down = 10 # number of initial characteristic lines (down side)
+num_ch_add = 5
 # init_theta_delta = 10e-11
 inflow_distance = 0.
 array_x_fm = np.empty(0)
@@ -370,7 +373,7 @@ array_theta_fm = np.empty(0)
 array_x_sl = np.empty(0)
 array_y_sl = np.empty(0)
 array_zero0 = np.zeros((int(num_ch_down),int(num_ch_up-1)))
-array_zero1 = np.zeros((int(num_ch_up + num_ch_down - 1),int(num_ch_up)))
+array_zero1 = np.zeros((int(num_ch_up + num_ch_down - 1),int(num_ch_down + num_ch_add)))
 
 ### x for characteristics
 array_x_up = np.ones((int(num_ch_up))) * array_point_dw[0]
@@ -584,54 +587,54 @@ del array_gamma_up; del array_gamma_down
 ### ====
 
 ### C+ 上のパラメーター？？？
-array_T_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_p_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_theta_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_V_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_rho_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_y_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_a_fr_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_M_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_alpha_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_lambda_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_Q_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_S_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
+array_T_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_p_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_theta_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_V_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_rho_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_y_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_a_fr_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_M_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_alpha_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_lambda_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_Q_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_S_plus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
 
 ### C- 上のパラメーター？？？
-array_T_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_p_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_theta_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_V_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_rho_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_y_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_a_fr_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_M_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_alpha_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_lambda_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_Q_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_S_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
+array_T_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_p_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_theta_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_V_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_rho_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_y_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_a_fr_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_M_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_alpha_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_lambda_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_Q_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_S_minus = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
 
 ### point3
-array_x_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_y_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_theta_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_p_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_rho_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_V_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_a_fr_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_gamma_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
+array_x_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_y_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_theta_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_p_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_rho_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_V_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_a_fr_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_gamma_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
 
 ### point_o
-array_lambda_12 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_lambda_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_p_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_rho_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_V_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_a_fr_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_R_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_A_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_T_o1 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
-array_T_o2 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up*2)))
+array_lambda_12 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_lambda_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_p_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_rho_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_V_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_a_fr_3 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_R_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_A_o = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_T_o1 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
+array_T_o2 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down + num_ch_add)))
 
 judge = 0
 judge_new = 1
@@ -1046,15 +1049,14 @@ num_ch_add = 5
 def func_add_ch(array_target):
     target_sl = array_target[0][int(num_ch_up-1)]
     array_target = np.delete(array_target,0,0)
-    array_target_add0 = np.linspace(target_sl, array_target[0][int(num_ch_up-1)],int(num_ch_add))
-    array_target_add1 = np.zeros((int(num_ch_add), int(num_ch_up*2+num_ch_add-1)))
-    array_target_add2 = np.zeros((int(num_ch_up+num_ch_down-1-num_ch_add), int(num_ch_add-1)))
-    for i_add in range(num_ch_add):
-        array_target_add1[-(i_add+1)][num_ch_add-(i_add)] = target_sl
-        array_target_add1[-1][num_ch_add-(i_add)] = array_target_add0[i_add]
-    array_target = np.hstack((array_target, array_target_add2))
-    array_target = np.vstack((array_target, array_target_add1))
+    array_target_add0 = np.linspace(target_sl,array_target[0][int(num_ch_up-1)],int(num_ch_add+1))
+    array_target_add0 = np.array([np.delete(array_target_add0, -1, 0)])
+    array_target_add1 = np.zeros((int(num_ch_add), int(num_ch_up-1)))
+    array_target_add1 = np.hstack((array_target_add1, np.transpose(array_target_add0)))
+    array_target_add1 = np.hstack((array_target_add1, np.zeros((int(num_ch_add),int(num_ch_down+num_ch_add)))))
+    array_target = np.vstack((array_target_add1,array_target))
     return array_target
+
 
 ### しっかりとマッハ数を linspace で等分
 ### その各マッハ数に応じた値を格納した方がいい
@@ -1063,6 +1065,8 @@ def func_add_ch(array_target):
 ### ==========================================
 ### delete
 ### ==========================================
+array_x = func_add_ch(array_x)
+array_y = func_add_ch(array_y)
 array_theta = func_add_ch(array_theta)
 array_M = func_add_ch(array_M)
 array_alpha = func_add_ch(array_alpha)
@@ -1126,10 +1130,19 @@ array_T_o2 = func_add_ch(array_T_o2)
 
 
 
+print('end')
 
 
 
 
+np.savetxt('array_x.csv', array_x, delimiter=',')
+np.savetxt('array_y.csv', array_y, delimiter=',')
+np.savetxt('array_theta.csv', array_theta/2./np.pi*360., delimiter=',')
+np.savetxt('array_p.csv', array_p, delimiter=',')
+np.savetxt('array_V.csv', array_V, delimiter=',')
+np.savetxt('array_M.csv', array_M, delimiter=',')
+np.savetxt('array_lambda_plus.csv', array_lambda_plus, delimiter=',')
+np.savetxt('array_lambda_minus.csv', array_lambda_minus, delimiter=',')
 
 
 

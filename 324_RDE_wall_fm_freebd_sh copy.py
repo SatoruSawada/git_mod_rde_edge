@@ -310,7 +310,7 @@ x_post = [5.66228974e-02, 5.63248708e-02, 7.06901613e-02, 1.03138136e-01,\
 U_post = w_post
 h_post_U_post = (h_post + U_post**2./2.) # SDT
 
-def func_delta_M(neu_target, M, gamma=gamma_eq_post):
+def func_delta_M(neu_target, M, gamma):
     part1 = ((gamma+1.)/(gamma-1.))**(1./2.)
     part2 = np.arctan(((gamma-1.)/(gamma+1.)*(M**2.-1.))**(1./2.))
     part3 = np.arctan((M**2.-1.)**(1./2.))
@@ -318,16 +318,23 @@ def func_delta_M(neu_target, M, gamma=gamma_eq_post):
     delta_neu = neu_target - neu_cal
     return delta_neu
 
-def func_neu2M(neu_target,eps = 10e-6):
+def func_M2neu(M, gamma):
+    part1 = ((gamma+1.)/(gamma-1.))**(1./2.)
+    part2 = np.arctan(((gamma-1.)/(gamma+1.)*(M**2.-1.))**(1./2.))
+    part3 = np.arctan((M**2.-1.)**(1./2.))
+    neu = part1*part2-part3
+    return neu
+
+def func_neu2M(neu_target, gamma, eps = 10e-10):
     M_a = 1.2
     M_b = 1.4
-    dM_a = func_delta_M(neu_target,M_a)
-    dM_b = func_delta_M(neu_target,M_b)
+    dM_a = func_delta_M(neu_target,M_a, gamma)
+    dM_b = func_delta_M(neu_target,M_b, gamma)
     while abs(dM_b) > eps:
         M_s = (M_a * dM_b - M_b * dM_a)/(dM_b - dM_a)
         M_a, M_b = M_b, M_s
         dM_a = dM_b
-        dM_b = func_delta_M(neu_target, M_b)
+        dM_b = func_delta_M(neu_target, M_b, gamma)
     M_result = M_b
     return M_result
 
@@ -338,7 +345,7 @@ def func_dM(M,p):
     dM = abs(M - v/soundspeed_fr(gas)) / M
     return dM
 
-def func_M2P(M, eps=10e-6):
+def func_M2P(M, eps=10e-10):
     P_a = 0.001 * 101300
     P_b = 0.002 * 101300
     dM_b = func_dM(M, P_b)
@@ -356,7 +363,6 @@ def func_M2P(M, eps=10e-6):
     V = M * a_fr
     gamma = a_fr**2.*rho/P_b
     return P_b, T, R, rho, a_fr, V, gamma 
-
 #------------------------------------------------------------------
 #### 1. characteristic lines -1st
 #------------------------------------------------------------------
@@ -402,51 +408,23 @@ del array_y_down
 ### ============================================================================================ 20211018_sawada
 ### ============================================================================================ 初期値の設定がよくわからない
 ### ============================================================================================ とりあえずリーマン不変量で
-### 流線角度：等差
-array_sample_up = np.linspace(angle_fm,angle_sl,num_ch_up)
-# print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
+### マッハ数：等差
+M_post = 1.
+neu_sl = angle_sl - (angle_fm - func_M2neu(M_post,gamma_eq_post))
+### 小賢しいが gamma 繰り返し計算で補正，ごめん
+gamma_sl = 1.2
+delta_gamma = 1.0
+eps_gamma = 10e-10
+while delta_gamma >= eps_gamma:
+    M_sl = func_neu2M(neu_sl,gamma_sl)
+    P_sl, T, R, rho, a_fr, V, gamma_sl_new = func_M2P(M_sl)
+    delta_gamma = abs(gamma_sl-gamma_sl_new)/gamma_sl
+    gamma_sl = gamma_sl_new
+array_M_up = np.linspace(M_post,M_sl,num_ch_up)
+print("gamma_sl ========", gamma_sl*1000)
+print("M_sl ========", M_sl)
 
-# C1 = 1.  ### Cy に対して
-# C2 = 0.6  
-# Cx = 1.8    ### rad以外 可変
-# Cy = np.pi ### rad Cx に対して
-# num_ratio = 2./10.
-# ang_ratio = 10e-3
-# jisu = 2
-
-# ### 無理やり，微小増加直線部（〇次）
-# num_ch_up0 = int(num_ch_up*num_ratio)
-# num_ch_up1 = num_ch_up - num_ch_up0
-# a1 = np.arange(num_ch_up0+1)
-
-# ### C0 * x ** 3. + C1
-# deg1_up = angle_fm
-# deg2_up = angle_fm*(1+ang_ratio)
-# C1_up = deg1_up
-# C0_up = (deg2_up-C1_up)/((num_ch_up0)**jisu)
-# # print("a1 ============", a1 * 360. / 2./ np.pi)
-# a10 = a1 
-# for i in range(jisu-1):
-#     a1 = a1 * a10
-# a1 = a1 * C0_up + C1_up
-
-# ### 曲線部
-# array_sample_up = np.linspace(angle_fm*(1+ang_ratio),360,int(num_ch_up1))
-# array_sample_up = (C1*np.arctan(C2*array_sample_up/360.*2.*np.pi-Cx) + Cy)# / 2. / np.pi * 360.
-# ### (0 ~ 360) ==>> (angle_fm ~ angle_sl)
-# Ca = (angle_fm*(1+ang_ratio) - angle_sl) / (array_sample_up[0]-array_sample_up[-1])
-# Cb = angle_fm*(1+ang_ratio) - Ca * array_sample_up[0]
-# array_sample_up = Ca * array_sample_up + Cb
-
-# a1 = np.delete(a1,-1,0)
-# array_sample_up = np.hstack((a1,array_sample_up))
-
-
-
-array_theta_up = array_sample_up
-print("array_theta_up ============", array_theta_up * 360. / 2./ np.pi)
-array_neu_up = array_sample_up - angle_fm
-array_M_up = np.zeros((int(num_ch_up)))
+array_neu_up = np.zeros((int(num_ch_up)))
 array_alpha_up = np.zeros((int(num_ch_up)))
 array_p_up = np.zeros((int(num_ch_up)))
 array_t_up = np.zeros((int(num_ch_up)))
@@ -455,10 +433,7 @@ array_rho_up = np.zeros((int(num_ch_up)))
 array_a_fr_up = np.zeros((int(num_ch_up)))
 array_V_up = np.zeros((int(num_ch_up)))
 array_gamma_up = np.zeros((int(num_ch_up)))
-### P_b, T, R, rho, a_fr, V, gamma 
 for i0 in range(int(num_ch_up)):
-    array_M_up[i0] = func_neu2M(array_neu_up[i0])
-    array_alpha_up[i0] = np.arcsin(1./array_M_up[i0])
     array_p_up[i0], \
         array_t_up[i0], \
             array_R_up[i0], \
@@ -466,7 +441,15 @@ for i0 in range(int(num_ch_up)):
                     array_a_fr_up[i0], \
                         array_V_up[i0], \
                             array_gamma_up[i0] = func_M2P(array_M_up[i0])
-# print("array_M_up ============", array_M_up)
+    array_neu_up[i0] = func_M2neu(array_M_up[i0], array_gamma_up[i0])
+    array_alpha_up[i0] = np.arcsin(1./array_M_up[i0])
+
+array_theta_up = array_neu_up + (angle_fm - func_M2neu(M_post,gamma_eq_post))
+print("array_M_up ============", array_M_up)
+print("array_p_up ============", array_p_up)
+print("array_V_up ============", array_V_up)
+print("array_theta_up ========", array_theta_up/2./np.pi*360.)
+print("array_gamma_up ========", array_gamma_up*1000)
 
 array_theta = np.flipud(np.diag(array_theta_up))
 array_neu = np.flipud(np.diag(array_neu_up))
@@ -494,46 +477,22 @@ array_V = np.delete(array_V,-1,0)
 array_gamma = np.delete(array_gamma,-1,0)
 
 #============================================================================
-### 流線角度：等差
-array_sample_down = np.linspace(angle_fm,angle_bottom,num_ch_down)
-# print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
+### マッハ数：等差
+M_post = 1.
+neu_bottom = -angle_bottom + (angle_fm + func_M2neu(M_post,gamma_eq_post))
+### 小賢しいが gamma 繰り返し計算で補正，ごめん
 
+gamma_bottom = 1.2
+delta_gamma = 1.0
+while delta_gamma >= eps_gamma:
+    M_bottom = func_neu2M(neu_bottom,gamma_bottom)
+    P_bottom, T, R, rho, a_fr, V, gamma_bottom_new = func_M2P(M_bottom)
+    delta_gamma = abs(gamma_bottom-gamma_bottom_new)/gamma_bottom
+    gamma_bottom = gamma_bottom_new
+array_M_down = np.linspace(M_post,M_bottom,num_ch_down)
+print("gamma_bottom ========", gamma_bottom*1000)
 
-### 無理やり，微小増加直線部
-# num_ch_down0 = int(num_ch_down*num_ratio)
-# num_ch_down1 = num_ch_down - num_ch_down0
-# a0 = np.arange(num_ch_down0+1)
-
-# ### C0 * x ** 3. + C1
-# deg1_down = angle_fm
-# deg2_down = angle_fm*(1-ang_ratio)
-# C1_down = deg1_down
-# C0_down = (deg2_down-C1_down)/((num_ch_down0)**jisu)
-# # print("a1 ============", a1 * 360. / 2./ np.pi)
-# a00 = a0 
-# for i in range(jisu-1):
-#     a0 = a0 * a00
-# a0 = a0 * C0_down + C1_down
-
-### 曲線部
-# array_sample_down = np.linspace(angle_fm*(1-ang_ratio),360,int(num_ch_down1))
-# array_sample_down = (C1*np.arctan(C2*array_sample_down/360.*2.*np.pi-Cx) + Cy)# / 2. / np.pi * 360.
-# ### (0 ~ 360) ==>> (angle_fm ~ angle_sl)
-# Ca = (angle_fm*(1-ang_ratio) - angle_bottom) / (array_sample_down[0]-array_sample_down[-1])
-# Cb = angle_fm*(1-ang_ratio) - Ca * array_sample_down[0]
-# array_sample_down = Ca * array_sample_down + Cb
-
-# a0 = np.delete(a0,-1,0)
-# array_sample_down = np.hstack((a0,array_sample_down))
-
-
-
-array_theta_down = array_sample_down
-print("array_theta_down ============", array_theta_down * 360. / 2./ np.pi)
-array_neu_down = array_sample_down
-array_neu_down = angle_fm - array_neu_down
-
-array_M_down = np.zeros((int(num_ch_down)))
+array_neu_down = np.zeros((int(num_ch_down)))
 array_alpha_down = np.zeros((int(num_ch_down)))
 array_p_down = np.zeros((int(num_ch_down)))
 array_t_down = np.zeros((int(num_ch_down)))
@@ -542,10 +501,7 @@ array_rho_down = np.zeros((int(num_ch_down)))
 array_a_fr_down = np.zeros((int(num_ch_down)))
 array_V_down = np.zeros((int(num_ch_down)))
 array_gamma_down = np.zeros((int(num_ch_down)))
-### P_b, T, R, rho, a_fr, V, gamma 
 for i0 in range(int(num_ch_down)):
-    array_M_down[i0] = func_neu2M(array_neu_down[i0])
-    array_alpha_down[i0] = np.arcsin(1./array_M_down[i0])
     array_p_down[i0], \
         array_t_down[i0], \
             array_R_down[i0], \
@@ -553,7 +509,15 @@ for i0 in range(int(num_ch_down)):
                     array_a_fr_down[i0], \
                         array_V_down[i0], \
                             array_gamma_down[i0] = func_M2P(array_M_down[i0])
-# print("array_M_down ============", array_M_down)
+    array_neu_down[i0] = func_M2neu(array_M_down[i0], array_gamma_down[i0])
+    array_alpha_down[i0] = np.arcsin(1./array_M_down[i0])
+array_theta_down = -array_neu_down + (angle_fm + func_M2neu(M_post,gamma_eq_post))
+print("array_M_down ============", array_M_down)
+print("array_p_down ============", array_p_down)
+print("array_V_down ============", array_V_down)
+print("array_theta_down ========", array_theta_down * 360. / 2./ np.pi)
+print("array_neu_down ========", array_neu_down * 360. / 2./ np.pi)
+print("array_gamma_down ========", array_gamma_down*1000)
 
 #============================================================================
 ### =====
