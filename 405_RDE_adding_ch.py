@@ -971,6 +971,20 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             # P1 = P_ple * (1.+(gamma_fr_ple-1.)/2.*M1) ** (-gamma_fr_ple/(gamma_fr_ple-1.))#######################################
             Pcr = (mdot_over_A1 * (v3 - v1) - P1 + P3 / A1_over_A3) / (1./A1_over_A3 - 1.) ### P2 in an article
             # print("Pcr =", Pcr, '/// P3 =', P3, '/// i =', i, 'blocked /// a =', a)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             ################################################ あくまで判定する基準 & choking flow での計算（end）
             ################################################ choking flow ではこれ以上計算する必要がない
             if Pcr >= P1: ### subsonic inflow, iteration until P1 = P2
@@ -1018,6 +1032,14 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
                 # print("P1 & P2 =", P1, '/// P3 =', P3, '/// i =', i, 'supersonic /// a =', a)
             else:
                 print("ERROR : inflow calculation")
+
+
+
+
+
+
+
+                
     print('===================================================================',i)
     ### inflow の進行距離計算
     inflow_distance += v3 * (array_x[-1][i] - array_x[-1][i-1]) / CJ_speed
