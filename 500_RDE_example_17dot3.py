@@ -370,6 +370,34 @@ for i in range(1,int(2)):### 20211022_sawada : 次の列の計算をしていな
             gas.SPX = s_post,array_p[j][i],x_post
             array_V[j][i] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
             array_rho[j][i] = gas.density_mass
+
+
+            print("===============================================================")
+            print("predictor")
+            print("===============================================================")
+            print("lambda_plus ", array_lambda_plus[j+1][i-1])
+            print("lambda_minus", array_lambda_minus[j-1][i])
+            print("lambda_o    ", array_lambda_o[j][i-1])
+            print("x_4         ", array_x[j][i])
+            print("y_4         ", array_y[j][i])
+            print("x_3         ", array_x_3[j][i-1])
+            print("y_3         ", array_y_3[j][i-1])
+            print("R_o         ", array_R_o[j][i-1])
+            print("A_o         ", array_A_o[j][i-1])
+            print("T_o1        ", array_T_o1[j][i-1])
+            print("T_o2        ", array_T_o2[j][i-1])
+            print("Q_plus      ", array_Q_plus[j+1][i-1])
+            print("S_plus      ", array_S_plus[j+1][i-1])
+            print("T_plus      ", array_T_plus[j+1][i-1])
+            print("Q_minus     ", array_Q_minus[j-1][i])
+            print("S_minus     ", array_S_minus[j-1][i])
+            print("T_minus     ", array_T_minus[j-1][i])
+            print("p_4         ", array_p[j][i])
+            print("theta_4     ", array_theta[j][i]/2./np.pi*360.)
+            print("V_4         ", array_V[j][i])
+            print("rho_4       ", array_rho[j][i])
+
+
             ### set predictor
             theta_3 = array_theta_3[j][i-1]
             delta_c = 1.0
@@ -461,6 +489,30 @@ for i in range(1,int(2)):### 20211022_sawada : 次の列の計算をしていな
                 theta_3 = theta_3_new
 
 
+                print("===============================================================")
+                print("corrector")
+                print("===============================================================")
+                print("lambda_plus ", array_lambda_plus[j+1][i-1])
+                print("lambda_minus", array_lambda_minus[j-1][i])
+                print("lambda_o    ", array_lambda_o[j][i-1])
+                print("x_4         ", array_x[j][i])
+                print("y_4         ", array_y[j][i])
+                print("x_3         ", array_x_3[j][i-1])
+                print("y_3         ", array_y_3[j][i-1])
+                print("R_o         ", array_R_o[j][i-1])
+                print("A_o         ", array_A_o[j][i-1])
+                print("T_o1        ", array_T_o1[j][i-1])
+                print("T_o2        ", array_T_o2[j][i-1])
+                print("Q_plus      ", array_Q_plus[j+1][i-1])
+                print("S_plus      ", array_S_plus[j+1][i-1])
+                print("T_plus      ", array_T_plus[j+1][i-1])
+                print("Q_minus     ", array_Q_minus[j-1][i])
+                print("S_minus     ", array_S_minus[j-1][i])
+                print("T_minus     ", array_T_minus[j-1][i])
+                print("p_4         ", array_p[j][i])
+                print("theta_4     ", array_theta[j][i]/2./np.pi*360.)
+                print("V_4         ", array_V[j][i])
+                print("rho_4       ", array_rho[j][i])
 
 
 

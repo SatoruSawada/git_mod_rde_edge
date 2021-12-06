@@ -770,8 +770,9 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
 
 
     elif j == j_bottom:
+        delta_angle_bottom = 1.0
         a = 0
-        while a == 0:
+        while a == 0 and delta_angle_bottom >= eps_c:
             ### b_bottom
             ### =====================================================================
             ### predictor
@@ -889,16 +890,37 @@ for i in range(1,int(num_ch_up)):### 20211022_sawada : 次の列の計算をし�
             
             if array_p[j][i] > P_ple and mode_bottom == 0: ### no inflow
                 # angle_bottom = angle_bottom ### stay
-                a = 1 ### 再計算なし 
+                a = 1 ### 再計算なし
+                delta_angle_bottom = eps_c * 0.99 ### 再計算なし
                 mode_bottom = 0 ### mode_bottom の変化なし
+                
             elif array_p[j][i] <= P_ple and mode_bottom == 0: ### 未燃混合気層の計算「1」層目の計算開始，ただの点
                 # angle_bottom = angle_bottom ### stay
                 a = 1 ### 再計算なし
-                mode_bottom = 1 ### mode_bottom : 0 -> 1（inflow有のモードに移行）
+                delta_angle_bottom = eps_c * 0.99 ### 再計算なし
+                mode_bottom = 1 ### mode_bottom : 0 -> 1（inflow有のモードに移行
+                
             elif array_p[j][i] <= P_ple and mode_bottom == 1: ### 未燃混合気層の計算「2」層目の計算開始，初期値の特性線の設定
-                # angle_bottom = angle_bottom ### stay
-                a = 1 ### 再計算なし
-                mode_bottom = 2 ### mode_bottom : 0 -> 1（inflow有のモードに移行）
+                ### 既燃ガス側の array_theta[j][i] を 既燃ガス側の array_theta[j][i-1] として計算（仮定） 
+                ### 既燃ガス側の array_p[j][i] と未燃ガス側の圧力が一致するように計算
+                ### 未燃ガス側の p, theta を計算　-> 
+                ### 既燃ガス側の array_theta[j][i] を 未燃ガス側の theta として計算（仮定）
+                ### a いらない？？？ delta_angle_bottom だけで操作可能では？？？
+                
+                
+                ### free boundary unit process
+                
+                
+                
+                
+                
+                if angle_bottom <= eps_c:
+                    a = 0 ### 再計算あり
+                    
+                    # angle_bottom = angle_bottom ### stay
+                    ### angle_bottom and array_bottom_point を更新して再計算
+                    
+                    mode_bottom = 2 ### mode_bottom : 0 -> 1（inflow有のモードに移行）
                 
                 
                 
