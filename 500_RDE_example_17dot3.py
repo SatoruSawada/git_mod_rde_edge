@@ -70,8 +70,10 @@ x_1 = 5.495
 y_1 = 26.020
 V_1 = 1728.9
 theta_1 = 24.090 /360.*2.*np.pi
-p_1 = 11.545 * 10e5
+p_1 = 11.545 * 10e4
 rho_1 = 1.6240
+### ===========
+a_fr_1 = np.sqrt(1.2*p_1/rho_1)
 
 ### point 2
 ### none
@@ -81,8 +83,10 @@ x_3 = 5.085
 y_3 = 26.080
 V_3 = 1726.8
 theta_3 = 24.000 /360.*2.*np.pi
-p_3 = 11.604 * 10e5
+p_3 = 11.604 * 10e4
 rho_3 = 1.6309
+### ===========
+a_fr_3 = np.sqrt(1.2*p_3/rho_3)
 
 ### point 4
 x_4 = 5.283
@@ -106,10 +110,10 @@ array_zero1 = np.zeros((int(num_ch_up + num_ch_down - 1),int(num_ch_down + num_c
 ### x for characteristics
 array_x_up = np.ones((int(num_ch_up))) * x_3 ### point 3
 array_x = np.flipud(np.diag(array_x_up))
-array_x = np.delete(array_x,-1,0)
 array_x_down = np.ones((int(num_ch_down))) * x_1 ### point 1
 array_x_down = np.transpose(np.array([array_x_down]))
 array_x_down = np.hstack((array_x_down,array_zero0))
+array_x_down = np.delete(array_x_down,0,0)
 array_x = np.vstack((array_x,array_x_down))
 array_x = np.hstack((array_x, array_zero1))
 del array_x_up
@@ -118,10 +122,10 @@ del array_x_down
 ### y for characteristics
 array_y_up = np.ones((int(num_ch_up))) * y_3 ### point 3
 array_y = np.flipud(np.diag(array_y_up))
-array_y = np.delete(array_y,-1,0)
 array_y_down = np.ones((int(num_ch_down))) * y_1 ### point 1
 array_y_down = np.transpose(np.array([array_y_down]))
 array_y_down = np.hstack((array_y_down,array_zero0))
+array_y_down = np.delete(array_y_down,0,0)
 array_y = np.vstack((array_y,array_y_down))
 array_y = np.hstack((array_y, array_zero1))
 del array_y_up
@@ -137,7 +141,7 @@ array_p_up = np.ones((int(num_ch_up))) * p_3 ### point 3
 array_t_up = np.zeros((int(num_ch_up)))
 array_R_up = np.zeros((int(num_ch_up)))
 array_rho_up = np.ones((int(num_ch_up))) * rho_3 ### point3
-array_a_fr_up = np.zeros((int(num_ch_up)))
+array_a_fr_up = np.zeros((int(num_ch_up))) * a_fr_3 ### point3
 array_V_up = np.ones((int(num_ch_up))) * V_3 ### point 3
 array_gamma_up = np.zeros((int(num_ch_up)))
 array_theta_up = np.ones((int(num_ch_up))) * theta_3 ### point 3
@@ -155,17 +159,7 @@ array_V = np.flipud(np.diag(array_V_up))
 array_gamma = np.flipud(np.diag(array_gamma_up))
 
 #============================================================================
-array_theta = np.delete(array_theta,-1,0)
 array_neu = np.delete(array_neu,-1,0)
-array_M = np.delete(array_M,-1,0)
-array_alpha = np.delete(array_alpha,-1,0)
-array_p = np.delete(array_p,-1,0)
-array_t = np.delete(array_t,-1,0)
-array_R = np.delete(array_R,-1,0)
-array_rho = np.delete(array_rho,-1,0)
-array_a_fr = np.delete(array_a_fr,-1,0)
-array_V = np.delete(array_V,-1,0)
-array_gamma = np.delete(array_gamma,-1,0)
 
 #============================================================================
 array_M_down = np.zeros((int(num_ch_down)))
@@ -175,7 +169,7 @@ array_p_down = np.ones((int(num_ch_down))) * p_1 ### point 1
 array_t_down = np.zeros((int(num_ch_down)))
 array_R_down = np.zeros((int(num_ch_down)))
 array_rho_down = np.ones((int(num_ch_down))) * rho_1 ### point 1
-array_a_fr_down = np.zeros((int(num_ch_down)))
+array_a_fr_down = np.zeros((int(num_ch_down))) * a_fr_1 ### point 1
 array_V_down = np.ones((int(num_ch_down))) * V_1 ### point 1
 array_gamma_down = np.zeros((int(num_ch_down)))
 array_theta_down = np.ones((int(num_ch_down))) * theta_1 ### point 1
@@ -184,51 +178,61 @@ array_theta_down = np.ones((int(num_ch_down))) * theta_1 ### point 1
 ### =====
 array_theta_down = np.transpose(np.array([array_theta_down]))
 array_theta_down = np.hstack((array_theta_down,array_zero0))
+array_theta_down = np.delete(array_theta_down,0,0)
 array_theta = np.vstack((array_theta,array_theta_down))
 array_theta = np.hstack((array_theta, array_zero1))
 ### =====
 array_M_down = np.transpose(np.array([array_M_down]))
 array_M_down = np.hstack((array_M_down,array_zero0))
+array_M_down = np.delete(array_M_down,0,0)
 array_M = np.vstack((array_M,array_M_down))
 array_M = np.hstack((array_M, array_zero1))
 ### =====
 array_alpha_down = np.transpose(np.array([array_alpha_down]))
 array_alpha_down = np.hstack((array_alpha_down,array_zero0))
+array_alpha_down = np.delete(array_alpha_down,0,0)
 array_alpha = np.vstack((array_alpha,array_alpha_down))
 array_alpha = np.hstack((array_alpha, array_zero1))
 ### =====
 array_p_down = np.transpose(np.array([array_p_down]))
 array_p_down = np.hstack((array_p_down,array_zero0))
+array_p_down = np.delete(array_p_down,0,0)
 array_p = np.vstack((array_p,array_p_down))
 array_p = np.hstack((array_p, array_zero1))
 ### =====
 array_t_down = np.transpose(np.array([array_t_down]))
 array_t_down = np.hstack((array_t_down,array_zero0))
+array_t_down = np.delete(array_t_down,0,0)
 array_t = np.vstack((array_t,array_t_down))
 array_t = np.hstack((array_t, array_zero1))
 ### =====
 array_R_down = np.transpose(np.array([array_R_down]))
 array_R_down = np.hstack((array_R_down,array_zero0))
+array_R_down = np.delete(array_R_down,0,0)
 array_R = np.vstack((array_R,array_R_down))
 array_R = np.hstack((array_R, array_zero1))
 ### =====
 array_rho_down = np.transpose(np.array([array_rho_down]))
 array_rho_down = np.hstack((array_rho_down,array_zero0))
+array_rho_down = np.delete(array_rho_down,0,0)
 array_rho = np.vstack((array_rho,array_rho_down))
 array_rho = np.hstack((array_rho, array_zero1))
 ### =====
 array_a_fr_down = np.transpose(np.array([array_a_fr_down]))
 array_a_fr_down = np.hstack((array_a_fr_down,array_zero0))
+array_a_fr_down = np.delete(array_a_fr_down,0,0)
 array_a_fr = np.vstack((array_a_fr,array_a_fr_down))
 array_a_fr = np.hstack((array_a_fr, array_zero1))
 ### =====
 array_V_down = np.transpose(np.array([array_V_down]))
 array_V_down = np.hstack((array_V_down,array_zero0))
+array_V_down = np.delete(array_V_down,0,0)
 array_V = np.vstack((array_V,array_V_down))
 array_V = np.hstack((array_V, array_zero1))
 ### =====
 array_gamma_down = np.transpose(np.array([array_gamma_down]))
 array_gamma_down = np.hstack((array_gamma_down,array_zero0))
+array_gamma_down = np.delete(array_gamma_down,0,0)
 array_gamma = np.vstack((array_gamma,array_gamma_down))
 array_gamma = np.hstack((array_gamma, array_zero1))
 
@@ -294,11 +298,19 @@ array_T_o2 = np.zeros((int(num_ch_up+num_ch_down-1), int(num_ch_up + num_ch_down
 
 
 ### point 4 の設定
-array_x[1][num_ch_up-1] = x_4
-array_y[1][num_ch_up-1] = y_4
-array_theta[1][num_ch_up-1] = theta_4
+# array_x[num_ch_up-1][1] = x_4
+# array_y[num_ch_up-1][1] = y_4
+# array_theta[num_ch_up-1][1] = theta_4
 
+### lambda_minus の計算
+array_lambda_minus[num_ch_up-2][1] = (array_y[num_ch_up-2][1]-array_y[num_ch_up][0]) / \
+    (array_x[num_ch_up-2][1]-array_x[num_ch_up][0])
 
+print('array_x[num_ch_up-2][1] =',array_x[num_ch_up-2][1])
+print('array_y[num_ch_up-2][1] =',array_y[num_ch_up-2][1])
+print('array_x[num_ch_up][0] =', array_x[num_ch_up][0])
+print('array_y[num_ch_up][0] =', array_y[num_ch_up][0])
+print('lambda_minus =',array_lambda_minus[num_ch_up-2][1])
 
 
 
@@ -307,212 +319,197 @@ mode_bottom = 0
 j_bottom = num_ch_up+num_ch_down-2
 eps_c = 10e-10
 
-for i in range(1,int(2)):### 20211022_sawada : 次の列の計算をしていないためにエラーが起きている
-    for j in range(int(num_ch_up-i), int(num_ch_up-i+1):
+### point 2 って保存しておくべきなのだろうか？とりあえず保存しない
+### point 4 って保存しておくべきなのだろうか？とりあえず保存しない
 
+for i in range(1,int(2)):### 20211022_sawada : 次の列の計算をしていないためにエラーが起きている
+    for j in range(int(num_ch_up-i), int(num_ch_up-i+1)):
         if j < j_bottom:
-            
             ### a_interior
             ### =====================================================================
             ### predictor
             ### =====================================================================
-            #####################################################################################################(c)
-            ### lambda_plus & lambda_minus - eq17dot47_eq17dot48 (first step predictor)
-            array_lambda_plus[j+1][i-1] = np.tan(array_theta[j+1][i-1]+array_alpha[j+1][i-1])
-            array_lambda_minus[j-1][i] = np.tan(array_theta[j-1][i]-array_alpha[j-1][i])
-            ### Q+ & Q- - eq17dot54_eq17dot55 (first step predictor) (noting delta is removed)
-            array_Q_plus[j+1][i-1] = np.sqrt((array_M[j+1][i-1])**2.-1.) / (array_rho[j+1][i-1]*array_V[j+1][i-1]**2.)
-            array_Q_minus[j-1][i] = np.sqrt((array_M[j-1][i])**2.-1.) / (array_rho[j-1][i]*array_V[j-1][i]**2.)
-            #####################################################################################################(d)
-            ### eq17dot44_eq17dot45
-            array_x[j][i], array_y[j][i] = func_cross_gas_dynamics(\
-                (array_x[j-1][i], array_y[j-1][i]),\
+            
+            ### Mach_line 24 -> _plus_2
+            
+            ### (c) 
+            p_2 = (array_p[j][i-1]+array_p[j+1][i-1])/2.
+            theta_2 = (array_theta[j][i-1]+array_theta[j+1][i-1])/2.
+            V_2 = (array_V[j][i-1]+array_V[j+1][i-1])/2.
+            rho_2 = (array_rho[j][i-1]+array_rho[j+1][i-1])/2.
+            a_fr_2 = np.sqrt(1.2*p_2/rho_2)
+            M_2 = V_2/a_fr_2
+            alpha_2 = np.arcsin(1./M_2)
+            theta_plus_24 = (theta_2+theta_4)/2.
+            lambda_plus_24 = np.tan(theta_plus_24+alpha_2)
+            ### （point 4 の傾きと座標）& 特性線 C- 1-3
+            ### point 1 & lambda_minus
+            ### point 4 & theta_4
+            x_2, y_2 = func_cross_gas_dynamics(\
+                (x_4, y_4),\
                     (array_x[j+1][i-1], array_y[j+1][i-1]),\
-                        array_lambda_minus[j-1][i], \
-                            array_lambda_plus[j+1][i-1])
-            ### T+ & T- - eq17dot52_eq17dot53 (first step predictor)
-            array_T_plus[j+1][i-1] = -array_S_plus[j+1][i-1] * (array_x[j][i]-array_x[j+1][i-1]) + \
-                array_Q_plus[j+1][i-1] * array_p[j+1][i-1] + array_theta[j+1][i-1]
-            array_T_minus[j-1][i] = -array_S_minus[j-1][i] * (array_x[j][i]-array_x[j-1][i]) + \
-                array_Q_minus[j-1][i] * array_p[j-1][i] - array_theta[j-1][i]
-            #####################################################################################################(e)
-            ### eq17dot49 (the modified euler predictor-corrector)
-            ### eq17dot43_eq17dot46
-            array_lambda_12[j-1][i] = (array_y[j+1][i-1] - array_y[j-1][i]) / (array_x[j+1][i-1] - array_x[j-1][i])
-            array_lambda_o[j][i-1] = np.tan((array_theta[j-1][i] + array_theta[j+1][i-1])/2.)
-            array_x_3[j][i-1],\
-                array_y_3[j][i-1],\
-                    array_theta_3[j][i-1],\
-                        array_lambda_o[j][i-1] = func_MEPC_theta3_mode1(\
-                array_theta[j-1][i],\
-                    array_theta[j+1][i-1],\
-                        (array_x[j-1][i], array_y[j-1][i]),\
-                            (array_x[j+1][i-1], array_y[j+1][i-1]),\
-                                (array_x[j][i], array_y[j][i]),\
-                                    array_lambda_12[j-1][i],\
-                                        array_lambda_o[j][i-1])
-            ### interpolating for the remaining flow properties gives... (p.203) 
-            array_p_3[j][i-1] = array_p[j+1][i-1]+(array_y_3[j][i-1]-array_y[j+1][i-1])/\
-                (array_y[j-1][i]-array_y[j+1][i-1])*(array_p[j-1][i]-array_p[j+1][i-1])
-            gas.SPX = s_post, array_p_3[j][i-1], x_post
-            array_rho_3[j][i-1] = gas.density_mass
-            array_V_3[j][i-1] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
-            #####################################################################################################(f)
-            array_a_fr_3[j][i-1] = soundspeed_fr(gas)
-            array_R_o[j][i-1] = array_rho_3[j][i-1] * array_V_3[j][i-1]
-            array_A_o[j][i-1] = array_a_fr_3[j][i-1] ** 2.
-            array_T_o1[j][i-1] = array_R_o[j][i-1] * array_V_3[j][i-1] + array_p_3[j][i-1] # using state3
-            array_T_o2[j][i-1] = array_p_3[j][i-1] - array_A_o[j][i-1] * array_rho_3[j][i-1] # using state3
-            ### eq.(g) & (h) for calculating p4, theta4
-            array_p[j][i] = (array_T_plus[j+1][i-1] + array_T_minus[j-1][i]) / (array_Q_plus[j+1][i-1] + array_Q_minus[j-1][i])
-            array_theta[j][i] = array_T_plus[j+1][i-1] - array_Q_plus[j+1][i-1] * array_p[j][i]
-            ### eq.(i) & (j) for calculating V4, rho4
-            gas.SPX = s_post,array_p[j][i],x_post
-            array_V[j][i] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
-            array_rho[j][i] = gas.density_mass
+                        lambda_plus_24, \
+                            array_lambda_minus[j-1][i])
+            ### point 2 interpolated between 1 and 3
+            
+            n = 0
+            while n <= 3:
+                n+=1
+                
+                p_2 = array_p[j+1][i-1] + (x_2-array_x[j+1][i-1])/(array_x[j][i-1]-array_x[j+1][i-1])*(array_p[j][i-1]-array_p[j+1][i-1])
+                theta_2 = array_theta[j+1][i-1] + (x_2-array_x[j+1][i-1])/(array_x[j][i-1]-array_x[j+1][i-1])*(array_theta[j][i-1]-array_theta[j+1][i-1])
+                V_2 = array_V[j+1][i-1] + (x_2-array_x[j+1][i-1])/(array_x[j][i-1]-array_x[j+1][i-1])*(array_V[j][i-1]-array_V[j+1][i-1])
+                rho_2 = array_rho[j+1][i-1] + (x_2-array_x[j+1][i-1])/(array_x[j][i-1]-array_x[j+1][i-1])*(array_rho[j][i-1]-array_rho[j+1][i-1])
 
-
+                a_fr_2 = np.sqrt(1.2*p_2/rho_2)
+                M_2 = V_2 /a_fr_2
+                alpha_2 = np.arcsin(1./M_2)
+                theta_plus_24 = (theta_2+theta_4)/2.
+                lambda_plus_24 = np.tan(theta_plus_24+alpha_2)
+                ### （point 4 の傾きと座標）& 特性線 C- 1-3
+                ### point 1 & lambda_minus
+                ### point 4 & theta_4
+                x_2, y_2 = func_cross_gas_dynamics(\
+                    (x_4, y_4),\
+                        (array_x[j+1][i-1], array_y[j+1][i-1]),\
+                            lambda_plus_24, \
+                                array_lambda_minus[j-1][i])
+                print('x_2 =', x_2, '/// y_2 =',y_2, '/// lambda_plus_24 =',lambda_plus_24)
+            
+            
+            ### (c)
+            theta_plus_24 = (theta_2+theta_4)/2.
+            y_plus_2 = (y_2+y_4)/2.
+            a_fr_2 = np.sqrt(1.2*p_2/rho_2)
+            M_2 = V_2 / a_fr_2
+            alpha_2 = np.arcsin(1./M_2)
+            lambda_plus_24 = np.tan(theta_plus_24 + alpha_2)
+            
+            Q_plus_2 = np.sqrt(M_2**2.-1.)/(rho_2*V_2**2.)
+            S_plus_2 = np.sin(theta_plus_24)/\
+                (y_plus_2*M_2*np.cos(theta_plus_24+alpha_2))
+            T_plus_2 = -S_plus_2*(x_4-x_2)+Q_plus_2*p_2+theta_2
+            
+            ### (d) - stream line 34
+            array_a_fr[j][i-1] = np.sqrt(1.2*array_p[j][i-1]/array_rho[j][i-1])
+            array_R_o[j][i-1] = array_rho[j][i-1]*array_V[j][i-1]
+            array_A_o[j][i-1] = array_a_fr[j][i-1]**2.
+            array_T_o1[j][i-1] = array_R_o[j][i-1]*array_V[j][i-1]+array_p[j][i-1]
+            array_T_o2[j][i-1] = array_p[j][i-1]-array_A_o[j][i-1]*array_rho[j][i-1]
+            
+            ### (e)
+            p_4 = (T_plus_2 - theta_4) / Q_plus_2
+            V_4 = (array_T_o1[j][i-1]-p_4)/array_R_o[j][i-1]
+            rho_4 = -(array_T_o2[j][i-1]-p_4)/array_A_o[j][i-1]
+            
             print("===============================================================")
             print("predictor")
             print("===============================================================")
-            print("lambda_plus ", array_lambda_plus[j+1][i-1])
-            print("lambda_minus", array_lambda_minus[j-1][i])
-            print("lambda_o    ", array_lambda_o[j][i-1])
-            print("x_4         ", array_x[j][i])
-            print("y_4         ", array_y[j][i])
-            print("x_3         ", array_x_3[j][i-1])
-            print("y_3         ", array_y_3[j][i-1])
-            print("R_o         ", array_R_o[j][i-1])
-            print("A_o         ", array_A_o[j][i-1])
-            print("T_o1        ", array_T_o1[j][i-1])
-            print("T_o2        ", array_T_o2[j][i-1])
-            print("Q_plus      ", array_Q_plus[j+1][i-1])
-            print("S_plus      ", array_S_plus[j+1][i-1])
-            print("T_plus      ", array_T_plus[j+1][i-1])
-            print("Q_minus     ", array_Q_minus[j-1][i])
-            print("S_minus     ", array_S_minus[j-1][i])
-            print("T_minus     ", array_T_minus[j-1][i])
-            print("p_4         ", array_p[j][i])
-            print("theta_4     ", array_theta[j][i]/2./np.pi*360.)
-            print("V_4         ", array_V[j][i])
-            print("rho_4       ", array_rho[j][i])
+            print("lambda_plus_24 ", lambda_plus_24)
+            print("x_2           ", x_2)
+            print("y_2           ", y_2)
+            print("R_o           ", array_R_o[j][i-1])
+            print("A_o           ", array_A_o[j][i-1])
+            print("T_o1          ", array_T_o1[j][i-1])
+            print("T_o2          ", array_T_o2[j][i-1])
+            print("Q_plus_2      ", Q_plus_2)
+            print("S_plus_2      ", S_plus_2)
+            print("T_plus_2      ", T_plus_2)
+            print("p_4           ", p_4)
+            print("V_4           ", V_4)
+            print("rho_4         ", rho_4)
+
+
 
 
             ### set predictor
-            theta_3 = array_theta_3[j][i-1]
+            theta = p_4
             delta_c = 1.0
             ### =====================================================================
             ### corrector : 全て入れなおせているのだろうか？
+            ### ここで stream line 34 の間の値を計算して利用
+            ### ここで 特性線 C+ 24 の間の値を計算して利用（average ）
             ### =====================================================================
             while delta_c >= eps_c:
-                #####################################################################################################(g)
-                ### along Mach line 24 (C+)
-                array_p_plus[j+1][i-1] = (array_p[j+1][i-1] + array_p[j][i]) /2.
-                array_theta_plus[j+1][i-1] = (array_theta[j+1][i-1] + array_theta[j][i]) /2.
-                gas.SPX = s_post, array_p_plus[j+1][i-1], x_post
-                array_V_plus[j+1][i-1] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
-                array_rho_plus[j+1][i-1] = gas.density_mass
-                array_y_plus[j+1][i-1] = (array_y[j+1][i-1] + array_y[j][i]) /2.
-                array_a_fr_plus[j+1][i-1] = soundspeed_fr(gas)
-                array_M_plus[j+1][i-1] = array_V_plus[j+1][i-1] / array_a_fr_plus[j+1][i-1]
-                array_alpha_plus[j+1][i-1] = np.arcsin(1./array_M_plus[j+1][i-1])
-                array_lambda_plus[j+1][i-1] = np.tan(array_theta_plus[j+1][i-1]+array_alpha_plus[j+1][i-1])
-                array_Q_plus[j+1][i-1] = np.sqrt(array_M_plus[j+1][i-1]**2.-1.) / (array_rho_plus[j+1][i-1]*array_V_plus[j+1][i-1]**2.)
-                ### along Mach line 14 (C-)
-                array_p_minus[j-1][i] = (array_p[j-1][i] + array_p[j][i]) /2.
-                array_theta_minus[j-1][i] = (array_theta[j-1][i] + array_theta[j][i]) /2.
-                gas.SPX = s_post, array_p_minus[j-1][i], x_post
-                array_V_minus[j-1][i] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
-                array_rho_minus[j-1][i] = gas.density_mass
-                array_y_minus[j-1][i] = (array_y[j-1][i] + array_y[j][i]) /2.
-                array_a_fr_minus[j-1][i] = soundspeed_fr(gas)
-                array_M_minus[j-1][i] = array_V_minus[j-1][i] / array_a_fr_minus[j-1][i]
-                array_alpha_minus[j-1][i] = np.arcsin(1./array_M_minus[j-1][i])
-                array_lambda_minus[j-1][i] = np.tan(array_theta_minus[j-1][i]-array_alpha_minus[j-1][i])
-                array_Q_minus[j-1][i] = np.sqrt(array_M_minus[j-1][i]**2.-1.) / (array_rho_minus[j-1][i]*array_V_minus[j-1][i]**2.)
-                #####################################################################################################(h)
-                ### eq17dot44_eq17dot45
-                array_x[j][i], array_y[j][i] = func_cross_gas_dynamics(\
-                    (array_x[j-1][i], array_y[j-1][i]),\
-                        (array_x[j+1][i-1], array_y[j+1][i-1]),\
-                            array_lambda_minus[j-1][i], \
-                                array_lambda_plus[j+1][i-1])
-                ### T+ & T- - eq17dot52_eq17dot53 (first step predictor
-                array_T_plus[j+1][i-1] = -array_S_plus[j+1][i-1] * (array_x[j][i]-array_x[j+1][i-1]) + \
-                    array_Q_plus[j+1][i-1] * array_p[j+1][i-1] + array_theta[j+1][i-1]
-                array_T_minus[j-1][i] = -array_S_minus[j-1][i] * (array_x[j][i]-array_x[j-1][i]) + \
-                    array_Q_minus[j-1][i] * array_p[j-1][i] - array_theta[j-1][i]
-                #####################################################################################################(i)
-                ### eq17dot49 (the modified euler predictor-corrector)
-                ### eq17dot43_eq17dot46
-                ### (theta3, theta4) -> corrector
-                array_lambda_o[j][i-1] = np.tan((array_theta_3[j][i-1]+array_theta[j][i])/2.)
-                array_x_3[j][i-1],\
-                    array_y_3[j][i-1],\
-                        array_theta_3[j][i-1],\
-                            array_lambda_o[j][i-1] = func_MEPC_theta3_mode2(\
-                    array_theta[j-1][i],\
-                        array_theta[j+1][i-1],\
-                        array_theta[j][i],\
-                            (array_x[j-1][i], array_y[j-1][i]),\
-                                (array_x[j+1][i-1], array_y[j+1][i-1]),\
-                                    (array_x[j][i], array_y[j][i]),\
-                                        array_lambda_12[j-1][i],\
-                                            array_lambda_o[j][i-1])
-                ### interpolating for the remaining flow properties gives... (p.203)
-                array_p_3[j][i-1] = array_p[j+1][i-1]+(array_y_3[j][i-1]-array_y[j+1][i-1])/(array_y[j-1][i]-array_y[j+1][i-1])*(array_p[j-1][i]-array_p[j+1][i-1])
-                gas.SPX = s_post, array_p_3[j][i-1], x_post
-                array_rho_3[j][i-1] = gas.density_mass
-                array_V_3[j][i-1] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
-                #####################################################################################################(j)
-                ### (start) ここで計算が「predictor」と「corrector」で異なる
-                array_p_o[j][i-1] = (array_p_3[j][i-1] + array_p[j][i]) / 2.
-                gas.SPX = s_post, array_p_o[j][i-1], x_post
-                array_rho_o[j][i-1] = gas.density_mass
-                array_V_o[j][i-1] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
-                ### (end)
-                array_a_fr_3[j][i-1] = soundspeed_fr(gas)
-                ### eq.(g) & (h) for calculating p4, theta4
-                array_p[j][i] = (array_T_plus[j+1][i-1] + array_T_minus[j-1][i]) / (array_Q_plus[j+1][i-1] + array_Q_minus[j-1][i])
-                array_theta[j][i] = array_T_plus[j+1][i-1] - array_Q_plus[j+1][i-1] * array_p[j][i]
-                ### eq.(i) & (j) for calculating V4, rho4
-                gas.SPX = s_post, array_p[j][i], x_post
-                array_V[j][i] = np.sqrt(2.0*(h_post_U_post - gas.enthalpy_mass))
-                array_rho[j][i] = gas.density_mass
-                ### count
-                array_a_fr[j][i] = soundspeed_fr(gas)
-                array_M[j][i] = array_V[j][i] / array_a_fr[j][i]
-                array_alpha[j][i] = np.arcsin(1./array_M[j][i])
+                    
+                ### Mach_line 24 -> _plus_2
+
+                n = 0
+                while n <= 3:
+                    n+=1
+
+                    p_2 = array_p[j+1][i-1] + (x_2-array_x[j+1][i-1])/(array_x[j][i-1]-array_x[j+1][i-1])*(array_p[j][i-1]-array_p[j+1][i-1])
+                    theta_2 = array_theta[j+1][i-1] + (x_2-array_x[j+1][i-1])/(array_x[j][i-1]-array_x[j+1][i-1])*(array_theta[j][i-1]-array_theta[j+1][i-1])
+                    V_2 = array_V[j+1][i-1] + (x_2-array_x[j+1][i-1])/(array_x[j][i-1]-array_x[j+1][i-1])*(array_V[j][i-1]-array_V[j+1][i-1])
+                    rho_2 = array_rho[j+1][i-1] + (x_2-array_x[j+1][i-1])/(array_x[j][i-1]-array_x[j+1][i-1])*(array_rho[j][i-1]-array_rho[j+1][i-1])
+                    a_fr_2 = np.sqrt(1.2*p_2/rho_2)
+                    M_2 = V_2 /a_fr_2
+                    
+                    ### （point 4 の傾きと座標）& 特性線 C- 1-3
+                    ### point 1 & lambda_minus
+                    ### point 4 & theta_4
+                    x_2, y_2 = func_cross_gas_dynamics(\
+                        (x_4, y_4),\
+                            (array_x[j+1][i-1], array_y[j+1][i-1]),\
+                                lambda_plus_24, \
+                                    array_lambda_minus[j-1][i])
+                    print('x_2 =', x_2, '/// y_2 =',y_2, '/// lambda_plus_24 =',lambda_plus_24)
+                
+                    ### (c)
+                    theta_plus_24 = (theta_2+theta_4)/2.
+                    y_24 = (y_2+y_4)/2.
+                    p_24 = (p_2+p_4)/2.
+                    rho_24 = (rho_2+rho_4)/2.
+                    V_24 = (V_2+V_4)/2.
+                    
+                    a_fr_24 = np.sqrt(1.2*p_24/rho_24)
+                    M_24 = V_24 / a_fr_24
+                    alpha_24 = np.arcsin(1./M_24)
+                    lambda_plus_24 = np.tan(theta_plus_24 + alpha_24)
+                
+                Q_plus_2 = np.sqrt(M_24**2.-1.)/(rho_24*V_24**2.)
+                S_plus_2 = np.sin(theta_plus_24)/\
+                    (y_24*M_24*np.cos(theta_plus_24+alpha_24))
+                T_plus_2 = -S_plus_2*(x_4-x_2)+Q_plus_2*p_2+theta_2
+                
+                
+                ### (d) - stream line 34
+                p_34 = (array_p[j][i-1]+p_4)/2.
+                rho_34 = (array_rho[j][i-1]+rho_4)/2.
+                V_34 = (array_V[j][i-1]+V_4)/2.
+                a_fr_34 = np.sqrt(1.2*p_34/rho_34)
+                array_R_o[j][i-1] = rho_34*V_34
+                array_A_o[j][i-1] = a_fr_34**2.
+                array_T_o1[j][i-1] = array_R_o[j][i-1]*V_34+p_34
+                array_T_o2[j][i-1] = p_34-array_A_o[j][i-1]*rho_34
+                
+                ### (e)
+                p_4 = (T_plus_2 - theta_4) / Q_plus_2
+                V_4 = (array_T_o1[j][i-1]-p_4)/array_R_o[j][i-1]
+                rho_4 = -(array_T_o2[j][i-1]-p_4)/array_A_o[j][i-1]
+
                 ### delta_c
-                theta_3_new = array_theta_3[j][i-1]
-                delta_c = abs((theta_3-theta_3_new)/theta_3)
-                theta_3 = theta_3_new
+                theta_new = p_4
+                delta_c = abs((theta-theta_new)/theta)
+                theta = theta_new
 
 
                 print("===============================================================")
                 print("corrector")
                 print("===============================================================")
-                print("lambda_plus ", array_lambda_plus[j+1][i-1])
-                print("lambda_minus", array_lambda_minus[j-1][i])
-                print("lambda_o    ", array_lambda_o[j][i-1])
-                print("x_4         ", array_x[j][i])
-                print("y_4         ", array_y[j][i])
-                print("x_3         ", array_x_3[j][i-1])
-                print("y_3         ", array_y_3[j][i-1])
-                print("R_o         ", array_R_o[j][i-1])
-                print("A_o         ", array_A_o[j][i-1])
-                print("T_o1        ", array_T_o1[j][i-1])
-                print("T_o2        ", array_T_o2[j][i-1])
-                print("Q_plus      ", array_Q_plus[j+1][i-1])
-                print("S_plus      ", array_S_plus[j+1][i-1])
-                print("T_plus      ", array_T_plus[j+1][i-1])
-                print("Q_minus     ", array_Q_minus[j-1][i])
-                print("S_minus     ", array_S_minus[j-1][i])
-                print("T_minus     ", array_T_minus[j-1][i])
-                print("p_4         ", array_p[j][i])
-                print("theta_4     ", array_theta[j][i]/2./np.pi*360.)
-                print("V_4         ", array_V[j][i])
-                print("rho_4       ", array_rho[j][i])
+                print("lambda_plus_24 ", lambda_plus_24)
+                print("x_2           ", x_2)
+                print("y_2           ", y_2)
+                print("R_o           ", array_R_o[j][i-1])
+                print("A_o           ", array_A_o[j][i-1])
+                print("T_o1          ", array_T_o1[j][i-1])
+                print("T_o2          ", array_T_o2[j][i-1])
+                print("Q_plus_2      ", Q_plus_2)
+                print("S_plus_2      ", S_plus_2)
+                print("T_plus_2      ", T_plus_2)
+                print("p_4           ", p_4)
+                print("V_4           ", V_4)
+                print("rho_4         ", rho_4)
 
 
 
